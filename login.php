@@ -138,25 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </svg>
         </button>
       </form>
-
-      <!-- Quick Demo Account Pills -->
-      <div class="demo-accounts-box">
-        <div class="demo-title">Akun Uji Coba Cepat (Klik untuk Mengisi):</div>
-        <div class="demo-pills">
-          <button type="button" class="demo-pill" data-user="admin" data-pw="admin123" title="Masuk sebagai Administrator">
-            Admin: admin
-          </button>
-          <button type="button" class="demo-pill" data-user="guru1" data-pw="guru123" title="Masuk sebagai Guru BK Hendra Gunawan">
-            Guru: guru1
-          </button>
-          <button type="button" class="demo-pill" data-user="guru2" data-pw="guru123" title="Masuk sebagai Guru Siti Aminah">
-            Guru: guru2
-          </button>
-          <button type="button" class="demo-pill" data-user="wali_farhan" data-pw="wali123" title="Masuk sebagai Wali Siswa M. Farhan">
-            Wali: wali_farhan
-          </button>
-        </div>
-      </div>
     </div>
 
     <div class="auth-footer-text">
@@ -197,10 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </div>
 
-<footer class="auth-page-footer">
-  &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA. All Rights Reserved.
-</footer>
-
 <script>
 // Toggle Password Visibility
 const toggleBtn = document.getElementById('toggle-pw-btn');
@@ -214,15 +191,6 @@ if (toggleBtn && pwInput) {
       : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
   });
 }
-
-// Demo Account Auto-Fill
-document.querySelectorAll('.demo-pill').forEach(pill => {
-  pill.addEventListener('click', function() {
-    document.getElementById('username').value = this.getAttribute('data-user');
-    document.getElementById('password').value = this.getAttribute('data-pw');
-    document.querySelector('.btn-login-submit').focus();
-  });
-});
 </script>
 
 </body>

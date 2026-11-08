@@ -11,17 +11,10 @@ Sistem ini telah melewati pengujian fungsionalitas menggunakan metode **Black Bo
 
 ---
 
-## 🌐 LIVE DEMO & AKSES ONLINE
+## 🌐 REPOSITORI GITHUB RESMI
 
-Aplikasi ini dapat diakses dan diuji secara online melalui tautan berikut:
-
-- 🔗 **GitHub Pages (Live Interactive Web):**  
-  [https://not-kuman.github.io/Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time/](https://not-kuman.github.io/Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time/)
 - 📦 **Repositori GitHub:**  
   [https://github.com/not-kuman/Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time.git](https://github.com/not-kuman/Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time.git)
-
-> **Catatan Penggunaan Online (GitHub Pages):**  
-> Versi GitHub Pages telah dilengkapi dengan *in-browser interactive engine* yang memuat basis data seeder secara mandiri. Pengguna dapat langsung menguji login Administrator, Guru BK (input pelanggaran, kalkulasi poin real-time, simulasi gateway WhatsApp), Wali Siswa (buku kendali & indikator sanksi), serta cetak laporan resmi ber-kop surat tanpa instalasi server tambahan!
 
 ---
 
@@ -120,7 +113,7 @@ Sistem menyediakan **Mode Simulasi DEMO** yang aktif secara default untuk lingku
 
 ## 5. AKUN DEMO PENGUJIAN (KREDENSIAL DEFAULT)
 
-Semua akun telah dipersiapkan dengan kata sandi terenkripsi `password_hash()` BCRYPT. Pada halaman login (`login.php`), tersedia juga **tombol pintas klik satu kali** untuk langsung mengisi kredensial:
+Untuk menjaga estetika dan keamanan antarmuka enterprise pada halaman login (`login.php`), seluruh kredensial akun uji coba didokumentasikan di sini. Semua akun telah dipersiapkan dengan kata sandi terenkripsi `password_hash()` BCRYPT:
 
 | Peran (Role) | Username | Password | Keterangan Akun |
 | :--- | :--- | :--- | :--- |
@@ -231,22 +224,23 @@ mysql -u root < database/seeder.sql
 
 ---
 
-## 8. PANDUAN DEPLOYMENT ONLINE (GITHUB PAGES & CLOUD)
+## 8. PANDUAN DEPLOYMENT ONLINE (FULL-STACK PHP & MYSQL)
 
-### Opsi A: Live Web via GitHub Pages (Static / Interactive Web Assembly)
-1. Buka repositori di GitHub: `https://github.com/not-kuman/Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time`
-2. Masuk ke tab **Settings** &gt; **Pages**.
-3. Pada bagian **Build and deployment** &gt; **Source**:
-   - Pilih **GitHub Actions** (Workflow `.github/workflows/deploy-pages.yml` akan otomatis aktif mendeploy direktori `/docs`), ATAU
-   - Pilih **Deploy from a branch** &gt; Branch: `main` &gt; Folder: `/docs` &gt; klik **Save**.
-4. Website live dapat langsung diakses di:
-   `https://not-kuman.github.io/Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time/`
+Aplikasi dibangun menggunakan arsitektur **PHP Native & MySQL Relasional**. Untuk menjalankan website secara online di internet, gunakan salah satu opsi hosting server berikut:
 
-### Opsi B: Full-Stack PHP & MySQL Cloud Deployment (Docker / Render / Railway)
+### Opsi 1: Shared Web Hosting (cPanel / InfinityFree / Hostinger / Niagahoster)
+1. Buat database MySQL baru pada panel hosting Anda (misal: `db_kartika_disiplin`).
+2. Masuk ke **phpMyAdmin** hosting, lalu impor:
+   - `database/schema.sql`
+   - `database/seeder.sql`
+3. Unggah seluruh file proyek ke folder publik (`public_html` atau `htdocs`).
+4. Sesuaikan konfigurasi koneksi basis data di file `config/database.php` (DB_HOST, DB_USER, DB_PASS, DB_NAME).
+5. Website siap diakses secara online via domain / subdomain Anda.
+
+### Opsi 2: Cloud Container Deployment (Docker / Render.com / Railway)
 Aplikasi telah dilengkapi berkas konfigurasi cloud siap pakai:
-- **Docker Compose:** Jalankan `docker-compose up -d` di server Anda (port `8080`). Skema database dan seeder akan otomatis dimuat.
+- **Docker Compose:** Jalankan `docker-compose up -d` di server / VPS Anda (port `8080`). Skema database dan seeder akan otomatis dimuat.
 - **Render.com:** Hubungkan repositori GitHub Anda dan impor `render.yaml`. Render akan otomatis membuat web service PHP 8.2 dan database MySQL gratis.
-- **Shared Hosting (cPanel / InfinityFree):** Unggah seluruh file ke `public_html`, buat database MySQL, impor `database/schema.sql` dan `database/seeder.sql`, lalu sesuaikan kredensial di `config/database.php`.
 
 ---
 
