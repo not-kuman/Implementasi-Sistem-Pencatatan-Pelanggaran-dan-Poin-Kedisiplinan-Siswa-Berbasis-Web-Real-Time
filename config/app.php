@@ -28,7 +28,13 @@ define('SCHOOL_NAME', 'SMA Kartika 1-2 Medan');
 define('APP_VERSION', '1.0.0');
 
 // Base URL detection
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+    || (!empty(getenv('VERCEL')));
+
+$protocol = $is_https ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $script_name = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
 

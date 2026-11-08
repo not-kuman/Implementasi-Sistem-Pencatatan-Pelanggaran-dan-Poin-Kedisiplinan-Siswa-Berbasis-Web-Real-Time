@@ -33,32 +33,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error_message = 'Nama pengguna dan kata sandi wajib diisi.';
     } else {
-        $pdo = get_db_connection();
-        $stmt = $pdo->prepare("SELECT id, username, password, full_name, role, status FROM users WHERE username = ? LIMIT 1");
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
+        try {
+            $pdo = get_db_connection();
+            $stmt = $pdo->prepare("SELECT id, username, password, full_name, role, status FROM users WHERE username = ? LIMIT 1");
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['password'])) {
-            if ($user['status'] !== 'active') {
-                $error_message = 'Akun Anda dinonaktifkan oleh Administrator. Hubungi pihak sekolah.';
+            if ($user && password_verify($password, $user['password'])) {
+                if ($user['status'] !== 'active') {
+                    $error_message = 'Akun Anda dinonaktifkan oleh Administrator. Hubungi pihak sekolah.';
+                } else {
+                    // Regenerate session ID for security against session fixation
+                    session_regenerate_id(true);
+
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['full_name'] = $user['full_name'];
+                    $_SESSION['role'] = $user['role'];
+
+                    // Update last login timestamp
+                    $stmtUpd = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                    $stmtUpd->execute([$user['id']]);
+
+                    // Redirect based on role
+                    redirect_to_dashboard($user['role']);
+                }
             } else {
-                // Regenerate session ID for security against session fixation
-                session_regenerate_id(true);
-
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['full_name'] = $user['full_name'];
-                $_SESSION['role'] = $user['role'];
-
-                // Update last login timestamp
-                $stmtUpd = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-                $stmtUpd->execute([$user['id']]);
-
-                // Redirect based on role
-                redirect_to_dashboard($user['role']);
+                $error_message = 'Nama pengguna atau kata sandi tidak cocok.';
             }
-        } else {
-            $error_message = 'Nama pengguna atau kata sandi tidak cocok.';
+        } catch (PDOException $e) {
+            if (getenv('VERCEL') && (DB_HOST === '127.0.0.1' || empty(getenv('DB_HOST')))) {
+                $error_message = 'Database MySQL cloud belum disetel di Vercel. Silakan isi Environment Variables (DB_HOST, DB_USER, DB_PASS, DB_NAME) di Vercel Dashboard.';
+            } else {
+                $error_message = 'Gagal terhubung ke database: ' . $e->getMessage();
+            }
         }
     }
 }
