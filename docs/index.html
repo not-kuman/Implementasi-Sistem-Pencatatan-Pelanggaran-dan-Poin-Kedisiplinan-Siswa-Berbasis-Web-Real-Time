@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIM Kedisiplinan Siswa &bull; SMA Kartika 1-2 Medan (Live Online)</title>
+  
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo-kartika.svg">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <script src="assets/vendor/chart.min.js"></script>
+
+  <style>
+    /* Online banner */
+    .online-indicator-bar {
+      background-color: var(--color-primary);
+      color: #E2E8F0;
+      padding: 6px 16px;
+      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .online-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: rgba(57, 124, 120, 0.3);
+      color: #5EEAD4;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 11px;
+    }
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10B981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10B981;
+    }
+    .role-switcher-select {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .role-switcher-select option {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+    }
+    /* Tab views handling */
+    .tab-content-panel { display: none; }
+    .tab-content-panel.active { display: block; animation: fadeIn 0.15s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Autocomplete dropdown in demo */
+    .search-results-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-modal);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .search-result-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .search-result-item:hover {
+      background-color: var(--color-accent-light);
+    }
+
+    /* Print area styling */
+    @media print {
+      .app-sidebar, .app-topbar, .app-footer, .online-indicator-bar, .no-print {
+        display: none !important;
+      }
+      .app-main { margin-left: 0 !important; }
+      .page-content { padding: 0 !important; }
+      .print-report-container { display: block !important; }
+    }
+  </style>
+</head>
+<body class="theme-default">
+
+<!-- Online Mode Sticky Bar -->
+<div class="online-indicator-bar no-print">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <span class="online-badge"><span class="online-dot"></span> LIVE WEB EDITION</span>
+    <span>SMA Kartika 1-2 Medan &bull; Berbasis Web Real-Time</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span style="font-size: 11px; opacity: 0.85;">Ganti Akun Demo:</span>
+    <select id="quick-role-select" class="role-switcher-select" onchange="switchRole(this.value)">
+      <option value="none">-- Pilih Sesi --</option>
+      <option value="admin">Administrator (Pak Hendro)</option>
+      <option value="guru1">Guru BK (Hendra Gunawan, S.Pd.)</option>
+      <option value="wali_farhan">Wali Siswa (Bpk. M. Ridwan / Farhan)</option>
+    </select>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 1. LOGIN VIEW (DITAMPILKAN JIKA BELUM LOGIN) -->
+<!-- ========================================== -->
+<div id="view-login" class="auth-body" style="display: none;">
+  <div class="auth-container">
+    <!-- Form Login Vertikal -->
+    <div class="auth-form-side">
+      <div>
+        <div class="auth-brand">
+          <img src="assets/images/logo-kartika.svg" alt="Logo SMA Kartika 1-2 Medan" class="auth-brand-logo">
+          <div class="auth-brand-info">
+            <span class="auth-brand-school">SMA Kartika 1-2 Medan</span>
+            <span class="auth-brand-system">Sistem Informasi Kedisiplinan Siswa</span>
+          </div>
+        </div>
+
+        <div class="auth-heading">
+          <h1 class="auth-title">Masuk ke Portal</h1>
+          <p class="auth-desc">Gunakan kredensial akun terdaftar Anda untuk melanjutkan.</p>
+        </div>
+
+        <div id="login-error-alert" class="auth-alert-error" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span id="login-error-text">Nama pengguna atau kata sandi tidak cocok.</span>
+        </div>
+
+        <form id="login-form" onsubmit="handleLoginSubmit(event)" autocomplete="off">
+          <div class="form-group">
+            <label for="login-username" class="form-label">Nama Pengguna (Username)</label>
+            <input type="text" id="login-username" class="form-control" placeholder="Masukkan username" required autofocus value="admin">
+          </div>
+
+          <div class="form-group">
+            <label for="login-password" class="form-label">Kata Sandi (Password)</label>
+            <div class="password-input-group">
+              <input type="password" id="login-password" class="form-control" placeholder="Masukkan kata sandi" required value="admin123">
+              <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login-submit">
+            <span>Masuk Sistem</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Quick Demo Account Pills -->
+        <div class="demo-accounts-box">
+          <div class="demo-title">Akun Uji Coba Cepat (Klik untuk Mengisi):</div>
+          <div class="demo-pills">
+            <button type="button" class="demo-pill" onclick="fillAndLogin('admin', 'admin123')">
+              Admin: admin
+            </button>
+            <button type="button" class="demo-pill" onclick="fillAndLogin('guru1', 'guru123')">
+              Guru BK: guru1
+            </button>
+            <button type="button" class="demo-pill" onclick="fillAndLogin('wali_farhan', 'wali123')">
+              Wali Siswa: wali_farhan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer-text">
+        &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA. All Rights Reserved.
+      </div>
+    </div>
+
+    <!-- Right Side: Integrasi Peta Digital & Identitas Institusi Sesuai Makalah -->
+    <div class="auth-info-side">
+      <div class="school-info-card">
+        <h2 class="info-title">SMA Kartika 1-2 Medan</h2>
+        <p class="info-address">
+          Jl. Brigjend Katamso No. 235, Medan Maimun, Kota Medan, Sumatera Utara<br>
+          Telepon: (061) 7864321<br>
+          Email: info@kartika12medan.sch.id
+        </p>
+
+        <!-- Digital Map Integration Container -->
+        <div class="map-container-box">
+          <iframe 
+            title="Peta Lokasi SMA Kartika 1-2 Medan"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=98.6750%2C3.5550%2C98.6990%2C3.5750&amp;layer=mapnik&amp;marker=3.5658%2C98.6872"
+            loading="lazy">
+          </iframe>
+          <div class="map-badge-coords">
+            GPS: 3.5658° N, 98.6872° E
+          </div>
+        </div>
+      </div>
+
+      <div class="info-security-notice">
+        <svg class="info-security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>Pencatatan real-time, transaksi atomik, dan notifikasi WhatsApp terintegrasi.</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="auth-page-footer">
+    &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA. All Rights Reserved.
+  </footer>
+</div>
+
+
+<!-- ========================================== -->
+<!-- 2. MAIN APPLICATION WORKSPACE VIEW         -->
+<!-- ========================================== -->
+<div id="view-app" class="app-wrapper" style="display: none;">
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar" id="app-sidebar">
+    <div class="sidebar-header">
+      <img src="assets/images/logo-kartika.svg" alt="Logo SMA Kartika 1-2" class="sidebar-logo">
+      <div class="sidebar-title">
+        <span class="school-name">SMA Kartika 1-2</span>
+        <span class="system-sub">SIM Kedisiplinan Siswa</span>
+      </div>
+    </div>
+
+    <!-- Role Badge -->
+    <div class="sidebar-role-indicator">
+      <div class="role-badge" id="sidebar-role-badge">ADMINISTRATOR</div>
+      <div class="user-name" id="sidebar-user-name">Pak Hendro Prabowo</div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="sidebar-nav" id="sidebar-nav-container">
+      <!-- Injected dynamically based on role -->
+    </nav>
+
+    <!-- Sidebar Bottom Action -->
+    <div class="sidebar-footer">
+      <button type="button" class="btn-sidebar-logout" onclick="logoutApp()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Keluar Sistem</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Layout -->
+  <div class="app-main">
+    <!-- Topbar -->
+    <header class="app-topbar no-print">
+      <div class="topbar-left">
+        <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span class="topbar-page-parent" id="topbar-parent-title">SIM Kedisiplinan</span>
+          <span class="topbar-page-separator">/</span>
+          <span class="topbar-page-current" id="topbar-current-title">Dashboard</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="topbar-notifications">
+          <button type="button" class="btn-topbar-icon" title="Notifikasi WhatsApp Terkirim" onclick="showNotificationLog()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="notif-badge" id="topbar-notif-count">5</span>
+          </button>
+        </div>
+
+        <div class="topbar-user-profile">
+          <div class="avatar-placeholder" id="topbar-avatar">HP</div>
+          <div class="user-meta">
+            <span class="user-meta-name" id="topbar-user-name">Hendro Prabowo</span>
+            <span class="user-meta-role" id="topbar-user-role">Administrator</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="page-content" id="main-content-panel">
+      <!-- 2.1 ADMIN DASHBOARD -->
+      <div id="tab-admin-dashboard" class="tab-content-panel active">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Ringkasan Sistem Kedisiplinan</h1>
+            <p class="page-subtitle">Pantauan status kedisiplinan siswa SMA Kartika 1-2 Medan tahun ajaran 2026/2027.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="showTab('admin-report')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <span>Rekapitulasi & Cetak</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Grid -->
+        <div class="grid-metrics">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">TOTAL SISWA AKTIF</span>
+              <div class="metric-icon primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            <div class="metric-value" id="stat-total-students">10</div>
+            <div class="metric-footer">Terdaftar di 7 rombongan belajar</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">TOTAL PELANGGARAN</span>
+              <div class="metric-icon warning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+            </div>
+            <div class="metric-value" id="stat-total-violations">15</div>
+            <div class="metric-footer">Catatan insiden tercatat</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">RATA-RATA POIN</span>
+              <div class="metric-icon accent">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+            </div>
+            <div class="metric-value" id="stat-avg-points">19.0</div>
+            <div class="metric-footer">Batas toleransi maksimal: 100 poin</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">PERLU PENANGANAN</span>
+              <div class="metric-icon danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+            </div>
+            <div class="metric-value" id="stat-critical-students">3</div>
+            <div class="metric-footer">Akumulasi poin &ge; 30 (SP 2 / SP 3)</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid-2-cols" style="margin-top: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Sebaran Kategori Pelanggaran</h3>
+              <span class="badge-pill">Analisis Frekuensi</span>
+            </div>
+            <div class="card-body">
+              <div style="height: 250px;">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Tren Pelanggaran Bulanan</h3>
+              <span class="badge-pill">Semester Ganjil 2026</span>
+            </div>
+            <div class="card-body">
+              <div style="height: 250px;">
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Summary Table -->
+        <div class="card" style="margin-top: 24px;">
+          <div class="card-header">
+            <h3 class="card-title">Siswa dengan Poin Tertinggi (Perlu Bimbingan Khusus)</h3>
+            <button class="btn btn-secondary btn-sm" onclick="showTab('admin-students')">Lihat Semua Siswa</button>
+          </div>
+          <div class="card-body no-padding">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Siswa</th>
+                  <th>NISN</th>
+                  <th>Kelas</th>
+                  <th>Poin</th>
+                  <th>Sanksi Aktif</th>
+                  <th>Wali Siswa</th>
+                </tr>
+              </thead>
+              <tbody id="admin-top-students-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.2 ADMIN DATA SISWA -->
+      <div id="tab-admin-students" class="tab-content-panel">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Data Siswa Terdaftar</h1>
+            <p class="page-subtitle">Daftar siswa, NISN, wali murid, dan total akumulasi poin kedisiplinan.</p>
+          </div>
+          <input type="text" class="form-control" style="max-width: 280px;" placeholder="Cari nama siswa atau NISN..." onkeyup="filterStudentsTable(this.value)">
+        </div>
+
+        <div class="card">
+          <div class="card-body no-padding">
+            <table class="app-table" id="table-students">
+              <thead>
+                <tr>
+                  <th>NISN</th>
+                  <th>Nama Lengkap Siswa</th>
+                  <th>Kelas</th>
+                  <th>Wali Murid</th>
+                  <th>Akumulasi Poin</th>
+                  <th>Tingkat Disiplin</th>
+                  <th>Status Sanksi</th>
+                </tr>
+              </thead>
+              <tbody id="students-full-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.3 ADMIN PELANGGARAN -->
+      <div id="tab-admin-violations" class="tab-content-panel">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Catatan Riwayat Pelanggaran</h1>
+            <p class="page-subtitle">Seluruh log insiden yang dicatat oleh guru dan petugas kedisiplinan sekolah.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-padding">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Kode Transaksi</th>
+                  <th>Tanggal</th>
+                  <th>Nama Siswa</th>
+                  <th>Kelas</th>
+                  <th>Jenis Pelanggaran</th>
+                  <th>Kategori</th>
+                  <th>Poin</th>
+                  <th>Guru Pelapor</th>
+                </tr>
+              </thead>
+              <tbody id="violations-full-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.4 ADMIN KATEGORI & SANKSI -->
+      <div id="tab-admin-sanctions" class="tab-content-panel">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Matriks Sanksi & Aturan Sekolah</h1>
+            <p class="page-subtitle">Pedoman pembinaan dan ambang batas akumulasi poin kedisiplinan SMA Kartika 1-2 Medan.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Tingkatan Ambang Batas Poin Sanksi</h3>
+          </div>
+          <div class="card-body no-padding">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Rentang Poin</th>
+                  <th>Nama Sanksi / Tindakan</th>
+                  <th>Deskripsi Pembinaan</th>
+                  <th>Tingkat Urgensi</th>
+                </tr>
+              </thead>
+              <tbody id="sanctions-rules-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.5 ADMIN CETAK LAPORAN (KOP SURAT RESMI) -->
+      <div id="tab-admin-report" class="tab-content-panel">
+        <div class="page-header-block no-print">
+          <div>
+            <h1 class="page-title">Rekapitulasi Laporan Kedisiplinan</h1>
+            <p class="page-subtitle">Pratinjau laporan resmi dengan Kop Surat SMA Kartika 1-2 Medan siap cetak.</p>
+          </div>
+          <button class="btn btn-primary" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span>Cetak / Simpan PDF</span>
+          </button>
+        </div>
+
+        <div class="report-paper">
+          <!-- Kop Surat Resmi -->
+          <div class="kop-surat">
+            <img src="assets/images/logo-kartika.svg" alt="Logo Kartika" class="kop-logo">
+            <div class="kop-header-text">
+              <div class="kop-yayasan">YAYASAN KARTIKA JAYA CABANG I BUKIT BARISAN</div>
+              <div class="kop-sekolah">SMA KARTIKA 1-2 MEDAN</div>
+              <div class="kop-alamat">Jl. Brigjend Katamso No. 235, Medan Maimun, Kota Medan, Sumatera Utara &bull; Telp. (061) 7864321</div>
+              <div class="kop-kontak">NPSN: 10210872 &bull; Akreditasi A &bull; Email: info@kartika12medan.sch.id</div>
+            </div>
+          </div>
+          <div class="kop-line-double"></div>
+
+          <div class="report-title-block">
+            <h2 class="report-doc-title">REKAPITULASI POIN KEDISIPLINAN SISWA</h2>
+            <div class="report-doc-meta">Tahun Ajaran 2026/2027 &bull; Semester Ganjil</div>
+          </div>
+
+          <table class="report-print-table">
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;">No</th>
+                <th>NISN</th>
+                <th>Nama Lengkap Siswa</th>
+                <th>Kelas</th>
+                <th style="text-align: center;">Poin</th>
+                <th>Status Pembinaan</th>
+              </tr>
+            </thead>
+            <tbody id="report-print-tbody"></tbody>
+          </table>
+
+          <!-- Signatures block -->
+          <div class="report-signature-grid">
+            <div class="signature-col">
+              <div class="sig-title">Mengetahui,</div>
+              <div class="sig-role">Kepala SMA Kartika 1-2 Medan</div>
+              <div class="sig-space"></div>
+              <div class="sig-name">Drs. H. Mulyadi, M.Pd.</div>
+              <div class="sig-nip">NIP. 19680512 199403 1 004</div>
+            </div>
+
+            <div class="signature-col">
+              <div class="sig-title">Medan, 8 November 2026</div>
+              <div class="sig-role">Koordinator Bimbingan Konseling</div>
+              <div class="sig-space"></div>
+              <div class="sig-name">Hendra Gunawan, S.Pd.</div>
+              <div class="sig-nip">NIP. 19820715 200801 1 012</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.6 GURU: CATAT PELANGGARAN (FITUR UTAMA) -->
+      <div id="tab-guru-add-violation" class="tab-content-panel">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Pencatatan Pelanggaran Siswa Real-Time</h1>
+            <p class="page-subtitle">Input insiden kedisiplinan, akumulasi poin otomatis, dan transmisi WhatsApp terpadu.</p>
+          </div>
+        </div>
+
+        <div class="grid-form-preview">
+          <!-- Form Input -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Formulir Catatan Pelanggaran</h3>
+            </div>
+            <div class="card-body">
+              <form id="record-violation-form" onsubmit="handleRecordViolationSubmit(event)">
+                <!-- Autocomplete Siswa -->
+                <div class="form-group" style="position: relative;">
+                  <label class="form-label">Pilih Siswa (Ketik Nama / NISN) *</label>
+                  <input type="text" id="input-student-search" class="form-control" placeholder="Ketik nama siswa, contoh: Farhan atau Amanda..." oninput="searchStudentsLive(this.value)" autocomplete="off" required>
+                  <input type="hidden" id="selected-student-id" required>
+                  <div id="student-search-results" class="search-results-dropdown"></div>
+                  <div id="selected-student-badge" style="display: none; margin-top: 8px;" class="info-box-pill">
+                    <strong>Siswa Terpilih:</strong> <span id="badge-student-name"></span> (<span id="badge-student-class"></span>) &bull; Poin Sekarang: <span id="badge-student-current-pts" class="text-danger font-bold">0</span>
+                  </div>
+                </div>
+
+                <!-- Jenis Pelanggaran -->
+                <div class="form-group">
+                  <label class="form-label">Jenis Pelanggaran *</label>
+                  <select id="select-violation-category" class="form-control" required onchange="handleCategoryChange()">
+                    <option value="">-- Pilih Jenis Pelanggaran --</option>
+                  </select>
+                </div>
+
+                <div class="grid-2-cols">
+                  <div class="form-group">
+                    <label class="form-label">Tanggal Kejadian</label>
+                    <input type="date" id="input-violation-date" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Bobot Poin Pelanggaran</label>
+                    <input type="number" id="input-violation-points" class="form-control" readonly style="background: #F1F5F9; font-weight: bold; color: var(--color-danger);">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Keterangan / Kronologi Tambahan</label>
+                  <textarea id="input-violation-notes" class="form-control" rows="3" placeholder="Contoh: Terlambat 20 menit saat upacara bendera hari Senin..." oninput="updateLiveWaPreview()"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  <span>Simpan Catatan & Kirim Notifikasi WhatsApp</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Live WhatsApp Preview Box -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Pratinjau Pesan WhatsApp Otomatis</h3>
+              <span class="badge-pill" style="background: #DCF8C6; color: #075E54; border: 1px solid #C2E2A8;">Format Baku Resmi</span>
+            </div>
+            <div class="card-body">
+              <p style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 12px;">
+                Pesan ini akan disimulasikan dan dikirim secara real-time ke nomor WhatsApp wali murid siswa terpilih:
+              </p>
+              <div class="wa-chat-bubble-box" id="wa-preview-text">
+                Pilih siswa dan jenis pelanggaran pada formulir di sebelah kiri untuk melihat pesan otomatis...
+              </div>
+
+              <div class="wa-meta-info" style="margin-top: 16px; font-size: 11.5px; color: var(--color-text-subtle);">
+                <strong>Penerima:</strong> <span id="wa-recipient-name">-</span> (<span id="wa-recipient-phone">-</span>)<br>
+                <strong>Status Gateway:</strong> Simulator Terhubung (Fonnte / Wablas API Ready)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.7 GURU: RIWAYAT CATATAN GURU -->
+      <div id="tab-guru-history" class="tab-content-panel">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Riwayat Pencatatan Insiden Guru</h1>
+            <p class="page-subtitle">Daftar pelanggaran siswa yang dicatat oleh Hendra Gunawan, S.Pd.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-padding">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Kode TRX</th>
+                  <th>Tanggal</th>
+                  <th>Nama Siswa</th>
+                  <th>Kelas</th>
+                  <th>Pelanggaran</th>
+                  <th>Poin</th>
+                  <th>Notifikasi WA</th>
+                </tr>
+              </thead>
+              <tbody id="guru-history-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.8 WALI SISWA DASHBOARD -->
+      <div id="tab-parent-dashboard" class="tab-content-panel">
+        <div class="page-header-block">
+          <div>
+            <h1 class="page-title">Buku Kendali Kedisiplinan Siswa</h1>
+            <p class="page-subtitle">Pantauan rekam jejak kedisiplinan dan pembinaan anak di SMA Kartika 1-2 Medan.</p>
+          </div>
+        </div>
+
+        <!-- Student Profile Header Card -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-body">
+            <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+              <div class="avatar-placeholder" style="width: 64px; height: 64px; font-size: 24px; background: var(--color-primary); color: #fff;">MF</div>
+              <div style="flex: 1;">
+                <h2 style="font-size: 20px; font-weight: 700; color: var(--color-primary); margin-bottom: 4px;" id="parent-student-name">M. Farhan Pratama</h2>
+                <div style="font-size: 13px; color: var(--color-text-muted);">
+                  NISN: <span id="parent-student-nisn">0071234501</span> &bull; Kelas: <span id="parent-student-class">X MIPA 1</span> &bull; Wali Murid: M. Ridwan
+                </div>
+              </div>
+              <div>
+                <span class="badge-pill" id="parent-status-badge" style="font-size: 13px; padding: 6px 14px;">SP 1 &bull; Perlu Bimbingan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Discipline Points Gauge Meter -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <h3 class="card-title">Indikator Akumulasi Poin Kedisiplinan</h3>
+            <span class="font-bold" id="parent-gauge-pts-text">25 / 100 Poin</span>
+          </div>
+          <div class="card-body">
+            <div style="background: #E2E8F0; border-radius: 8px; height: 16px; overflow: hidden; margin-bottom: 8px;">
+              <div id="parent-gauge-bar" style="width: 25%; height: 100%; background: #D6A34D; transition: width 0.3s;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: var(--color-text-subtle);">
+              <span>0 Poin (Tertib)</span>
+              <span>30 Poin (SP 1)</span>
+              <span>50 Poin (SP 2)</span>
+              <span>75 Poin (SP 3)</span>
+              <span>100 Poin (Drop Out)</span>
+            </div>
+            <p style="font-size: 12px; color: var(--color-text-muted); margin-top: 14px;">
+              * Ketentuan: Jika akumulasi poin mencapai 100 poin, pihak sekolah berhak mengembalikan siswa secara resmi kepada orang tua/wali.
+            </p>
+          </div>
+        </div>
+
+        <!-- History of violations for child -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Catatan Riwayat Pelanggaran Anak</h3>
+          </div>
+          <div class="card-body no-padding">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Jenis Pelanggaran</th>
+                  <th>Kategori</th>
+                  <th>Bobot Poin</th>
+                  <th>Tindakan / Bimbingan Guru</th>
+                </tr>
+              </thead>
+              <tbody id="parent-violations-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- App Unified Footer with Exact Required Text -->
+    <footer class="app-footer no-print">
+      <div class="footer-copyright-text">
+        &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA. All Rights Reserved.
+      </div>
+      <div class="footer-meta-text">
+        <span>SMA Kartika 1-2 Medan</span>
+        <span class="footer-dot">&bull;</span>
+        <span>Sistem Informasi Kedisiplinan Siswa</span>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 3. MODAL POPUPS & NOTIFICATION DIALOGS     -->
+<!-- ========================================== -->
+
+<!-- WhatsApp Simulator Modal -->
+<div class="modal-overlay" id="modal-wa-simulator" style="display: none;">
+  <div class="modal-container" style="max-width: 480px;">
+    <div class="modal-header" style="background: #075E54; color: #FFFFFF;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <h4 style="color: #fff; margin: 0; font-size: 15px;">Simulasi WhatsApp Gateway Siswa</h4>
+      </div>
+      <button type="button" class="modal-close" style="color: #fff;" onclick="closeWaModal()">&times;</button>
+    </div>
+    <div class="modal-body" style="background: #ECE5DD; padding: 20px;">
+      <div class="wa-chat-bubble" id="modal-wa-message-content" style="background: #DCF8C6; padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.15); white-space: pre-wrap;">
+      </div>
+      <div style="margin-top: 12px; font-size: 11px; color: #6B7280; text-align: right;">
+        Status: <span style="color: #059669; font-weight: 600;">Terkirim ke +6281298760001 (Wali Murid)</span>
+      </div>
+    </div>
+    <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 8px;">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeWaModal()">Tutup</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="finishWaDemo()">Mengerti & Selesai</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification History Modal -->
+<div class="modal-overlay" id="modal-notif-history" style="display: none;">
+  <div class="modal-container" style="max-width: 580px;">
+    <div class="modal-header">
+      <h4 style="margin: 0; font-size: 16px;">Log Transmisi Notifikasi WhatsApp</h4>
+      <button type="button" class="modal-close" onclick="closeNotifModal()">&times;</button>
+    </div>
+    <div class="modal-body" style="max-height: 380px; overflow-y: auto;">
+      <div id="notif-logs-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeNotifModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Global Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="assets/js/toast.js"></script>
+
+<script>
+/**
+ * SIM KEDISIPLINAN SISWA - IN-BROWSER INTERACTIVE ENGINE
+ * Loaded directly with seed data for GitHub Pages live demonstration
+ */
+
+// 1. Initial State Data matching database/seeder.sql
+const initialData = {
+  currentUser: null,
+  students: [
+    { id: 1, nisn: '0071234501', name: 'M. Farhan Pratama', class_name: 'X MIPA 1', parent_name: 'M. Ridwan', phone: '6281298760001', points: 25, status: 'warning', active_sanction: 'Peringatan Lisan & Bimbingan' },
+    { id: 2, nisn: '0071234502', name: 'Dimas Aditya Putra', class_name: 'X MIPA 1', parent_name: 'Surya Dharma', phone: '6281298760002', points: 40, status: 'danger', active_sanction: 'Surat Peringatan II (SP 2)' },
+    { id: 3, nisn: '0071234503', name: 'Amanda Putri Utami', class_name: 'X MIPA 1', parent_name: 'Budi Utomo', phone: '6281298760003', points: 5, status: 'normal', active_sanction: 'Peringatan Lisan' },
+    { id: 4, nisn: '0071234504', name: 'Siti Nurhaliza', class_name: 'X MIPA 2', parent_name: 'H. Anwar', phone: '6281298760004', points: 0, status: 'clean', active_sanction: 'Tertib (Tanpa Sanksi)' },
+    { id: 5, nisn: '0071234505', name: 'Rizky Ramadhan', class_name: 'X MIPA 2', parent_name: 'Rahmat Hidayat', phone: '6281298760005', points: 15, status: 'warning', active_sanction: 'Peringatan Lisan' },
+    { id: 6, nisn: '0071234506', name: 'Bagus Prasetya', class_name: 'XI MIPA 1', parent_name: 'Joko Susilo', phone: '6281298760006', points: 65, status: 'critical', active_sanction: 'Surat Peringatan III (SP 3)' },
+    { id: 7, nisn: '0071234507', name: 'Cut Nadia Safira', class_name: 'XI MIPA 1', parent_name: 'Teuku Iskandar', phone: '6281298760007', points: 10, status: 'normal', active_sanction: 'Peringatan Lisan' },
+    { id: 8, nisn: '0071234508', name: 'Kevin Sanjaya', class_name: 'XI IPS 1', parent_name: 'Sanjaya Tan', phone: '6281298760008', points: 0, status: 'clean', active_sanction: 'Tertib (Tanpa Sanksi)' },
+    { id: 9, nisn: '0071234509', name: 'Alya Zahra', class_name: 'XII MIPA 1', parent_name: 'Zulkifli', phone: '6281298760009', points: 0, status: 'clean', active_sanction: 'Tertib (Tanpa Sanksi)' },
+    { id: 10, nisn: '0071234510', name: 'Rian Hidayat', class_name: 'XII IPS 1', parent_name: 'Ahmad Syahputra', phone: '6281298760010', points: 30, status: 'warning', active_sanction: 'Surat Peringatan I (SP 1)' }
+  ],
+  categories: [
+    { id: 1, name: 'Datang terlambat ke sekolah (< 15 menit)', type: 'Ringan', points: 5 },
+    { id: 2, name: 'Datang terlambat ke sekolah (> 15 menit)', type: 'Ringan', points: 10 },
+    { id: 3, name: 'Seragam tidak lengkap / tidak rapi (tanpa dasi/topi/bet)', type: 'Ringan', points: 5 },
+    { id: 4, name: 'Memakai sepatu atau kaus kaki tidak sesuai ketentuan', type: 'Ringan', points: 5 },
+    { id: 5, name: 'Rambut gondrong / tidak rapi bagi siswa putra', type: 'Ringan', points: 10 },
+    { id: 6, name: 'Membuang sampah sembarangan di lingkungan sekolah', type: 'Ringan', points: 5 },
+    { id: 7, name: 'Meninggalkan jam pelajaran tanpa izin (bolos mata pelajaran)', type: 'Sedang', points: 15 },
+    { id: 8, name: 'Membawa / memainkan smartphone saat kegiatan belajar tanpa izin', type: 'Sedang', points: 15 },
+    { id: 9, name: 'Melompat pagar atau keluar pekarangan sekolah tanpa izin piket', type: 'Sedang', points: 20 },
+    { id: 10, name: 'Bersikap tidak sopan atau membangkang terhadap guru/staf', type: 'Sedang', points: 25 },
+    { id: 11, name: 'Merokok atau membawa rokok/vape di lingkungan sekolah', type: 'Berat', points: 40 },
+    { id: 12, name: 'Terlibat perkelahian atau tawuran antarpelajar', type: 'Berat', points: 75 },
+    { id: 13, name: 'Membawa senjata tajam atau benda berbahaya ke sekolah', type: 'Berat', points: 80 },
+    { id: 14, name: 'Melakukan tindak perundungan (bullying) fisik atau verbal', type: 'Berat', points: 50 },
+    { id: 15, name: 'Penyalahgunaan narkoba atau minuman keras', type: 'Berat', points: 100 }
+  ],
+  violations: [
+    { trx: 'TRX-202611-0001', date: '2026-11-08', student_id: 1, student_name: 'M. Farhan Pratama', class: 'X MIPA 1', cat_name: 'Datang terlambat ke sekolah (> 15 menit)', cat_type: 'Ringan', points: 10, teacher: 'Hendra Gunawan, S.Pd.' },
+    { trx: 'TRX-202611-0002', date: '2026-11-07', student_id: 1, student_name: 'M. Farhan Pratama', class: 'X MIPA 1', cat_name: 'Meninggalkan jam pelajaran tanpa izin (bolos)', cat_type: 'Sedang', points: 15, teacher: 'Hendra Gunawan, S.Pd.' },
+    { trx: 'TRX-202611-0003', date: '2026-11-06', student_id: 2, student_name: 'Dimas Aditya Putra', class: 'X MIPA 1', cat_name: 'Merokok di lingkungan sekolah', cat_type: 'Berat', points: 40, teacher: 'Siti Aminah, M.Pd.' },
+    { trx: 'TRX-202611-0004', date: '2026-11-05', student_id: 6, student_name: 'Bagus Prasetya', class: 'XI MIPA 1', cat_name: 'Melakukan tindak perundungan (bullying)', cat_type: 'Berat', points: 50, teacher: 'Hendra Gunawan, S.Pd.' },
+    { trx: 'TRX-202611-0005', date: '2026-11-04', student_id: 6, student_name: 'Bagus Prasetya', class: 'XI MIPA 1', cat_name: 'Meninggalkan jam pelajaran tanpa izin', cat_type: 'Sedang', points: 15, teacher: 'Hendra Gunawan, S.Pd.' }
+  ],
+  sanctionRules: [
+    { range: '0 Poin', name: 'Tertib (Tanpa Sanksi)', desc: 'Siswa mematuhi seluruh tata tertib sekolah.', urgency: 'Rendah' },
+    { range: '1 - 15 Poin', name: 'Peringatan Lisan & Bimbingan Wali Kelas', desc: 'Bimbingan persuasif dan pembinaan etika.', urgency: 'Rendah' },
+    { range: '16 - 30 Poin', name: 'Surat Peringatan I (SP 1) & Penugasan Edukatif', desc: 'Penerbitan SP 1 dan pemberitahuan tertulis kepada wali.', urgency: 'Sedang' },
+    { range: '31 - 50 Poin', name: 'Surat Peringatan II (SP 2) & Pemanggilan Orang Tua I', desc: 'Konseling mendalam bersama guru BK dan orang tua.', urgency: 'Tinggi' },
+    { range: '51 - 75 Poin', name: 'Surat Peringatan III (SP 3) & Skorsing 3 Hari', desc: 'Skorsing belajar di rumah selama 3 hari kerja.', urgency: 'Kritis' },
+    { range: '76 - 99 Poin', name: 'Skorsing Terakhir 7 Hari & Perjanjian Bermaterai', desc: 'Peringatan final sebelum tindakan pemulangan.', urgency: 'Kritis' },
+    { range: '>= 100 Poin', name: 'Pengembalian Siswa Kepada Orang Tua (Drop Out)', desc: 'Pemberhentian status kesiswaan SMA Kartika 1-2 Medan.', urgency: 'Kritis' }
+  ],
+  notifications: [
+    { id: 1, phone: '6281298760001', recipient: 'M. Ridwan', student: 'M. Farhan Pratama', status: 'Terkirim', time: '8 Nov 2026 07:45' },
+    { id: 2, phone: '6281298760001', recipient: 'M. Ridwan', student: 'M. Farhan Pratama', status: 'Terkirim', time: '7 Nov 2026 11:15' },
+    { id: 3, phone: '6281298760002', recipient: 'Surya Dharma', student: 'Dimas Aditya Putra', status: 'Terkirim', time: '6 Nov 2026 13:30' },
+    { id: 4, phone: '6281298760006', recipient: 'Joko Susilo', student: 'Bagus Prasetya', status: 'Terkirim', time: '5 Nov 2026 09:20' },
+    { id: 5, phone: '6281298760006', recipient: 'Joko Susilo', student: 'Bagus Prasetya', status: 'Terkirim', time: '4 Nov 2026 10:10' }
+  ]
+};
+
+// Retrieve or Initialize Local Storage
+function getAppState() {
+  const saved = localStorage.getItem('kartika_sim_state');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return initialData;
+}
+
+function saveAppState(state) {
+  localStorage.setItem('kartika_sim_state', JSON.stringify(state));
+}
+
+let appState = getAppState();
+
+// Calculate sanction tier based on points
+function getSanctionForPoints(pts) {
+  if (pts >= 100) return 'Pengembalian Kepada Orang Tua (Drop Out)';
+  if (pts >= 76) return 'Skorsing Terakhir 7 Hari & Perjanjian Bermaterai';
+  if (pts >= 51) return 'Surat Peringatan III (SP 3) & Skorsing 3 Hari';
+  if (pts >= 31) return 'Surat Peringatan II (SP 2) & Pemanggilan Orang Tua I';
+  if (pts >= 16) return 'Surat Peringatan I (SP 1) & Penugasan Edukatif';
+  if (pts >= 1) return 'Peringatan Lisan & Bimbingan Wali Kelas';
+  return 'Tertib (Tanpa Sanksi)';
+}
+
+// Format Indonesian Date
+function formatIndoDate(dateStr) {
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// 2. Authentication and Session Switching
+function initApp() {
+  // Check if current user is saved in session
+  const storedUser = sessionStorage.getItem('kartika_current_user');
+  if (storedUser) {
+    try {
+      appState.currentUser = JSON.parse(storedUser);
+      renderAppView();
+      return;
+    } catch(e) {}
+  }
+  // Default show login
+  renderLoginView();
+}
+
+function renderLoginView() {
+  document.getElementById('view-login').style.display = 'flex';
+  document.getElementById('view-app').style.display = 'none';
+  document.getElementById('quick-role-select').value = 'none';
+}
+
+function renderAppView() {
+  const user = appState.currentUser;
+  if (!user) {
+    renderLoginView();
+    return;
+  }
+
+  document.getElementById('view-login').style.display = 'none';
+  document.getElementById('view-app').style.display = 'flex';
+  document.getElementById('quick-role-select').value = user.role === 'admin' ? 'admin' : (user.role === 'teacher' ? 'guru1' : 'wali_farhan');
+
+  // Populate user headers
+  document.getElementById('sidebar-role-badge').innerText = user.role.toUpperCase();
+  document.getElementById('sidebar-user-name').innerText = user.name;
+  document.getElementById('topbar-user-name').innerText = user.name;
+  document.getElementById('topbar-user-role').innerText = user.roleTitle;
+  document.getElementById('topbar-avatar').innerText = user.avatar;
+  document.getElementById('topbar-notif-count').innerText = appState.notifications.length;
+
+  // Build Sidebar Nav Links based on Role
+  buildSidebarNav(user.role);
+
+  // Render Role Dashboard
+  if (user.role === 'admin') {
+    showTab('admin-dashboard');
+    renderAdminDashboard();
+    renderStudentsTables();
+    renderViolationsTable();
+    renderSanctionsTable();
+    renderReportPrintTable();
+  } else if (user.role === 'teacher') {
+    showTab('guru-add-violation');
+    initGuruAddViolationForm();
+    renderGuruHistory();
+  } else if (user.role === 'parent') {
+    showTab('parent-dashboard');
+    renderParentDashboard();
+  }
+}
+
+function fillAndLogin(userRole, password) {
+  if (userRole === 'admin') {
+    appState.currentUser = { role: 'admin', name: 'Pak Hendro Prabowo', roleTitle: 'Administrator Sekolah', avatar: 'HP' };
+  } else if (userRole === 'guru1') {
+    appState.currentUser = { role: 'teacher', name: 'Hendra Gunawan, S.Pd.', roleTitle: 'Guru Bimbingan Konseling (BK)', avatar: 'HG' };
+  } else if (userRole === 'wali_farhan') {
+    appState.currentUser = { role: 'parent', name: 'Bpk. M. Ridwan', roleTitle: 'Wali Murid (M. Farhan Pratama)', avatar: 'MR', studentId: 1 };
+  }
+  sessionStorage.setItem('kartika_current_user', JSON.stringify(appState.currentUser));
+  Toast.success('Berhasil Masuk', `Selamat datang, ${appState.currentUser.name}`);
+  renderAppView();
+}
+
+function switchRole(roleVal) {
+  if (roleVal === 'none') {
+    logoutApp();
+  } else {
+    fillAndLogin(roleVal, '');
+  }
+}
+
+function handleLoginSubmit(e) {
+  e.preventDefault();
+  const u = document.getElementById('login-username').value.trim();
+  if (u.includes('admin')) {
+    fillAndLogin('admin', '');
+  } else if (u.includes('guru') || u.includes('hendra')) {
+    fillAndLogin('guru1', '');
+  } else {
+    fillAndLogin('wali_farhan', '');
+  }
+}
+
+function logoutApp() {
+  sessionStorage.removeItem('kartika_current_user');
+  appState.currentUser = null;
+  Toast.info('Keluar Sistem', 'Anda telah keluar dari sistem dengan aman.');
+  renderLoginView();
+}
+
+function togglePasswordVisibility() {
+  const pw = document.getElementById('login-password');
+  pw.type = pw.type === 'password' ? 'text' : 'password';
+}
+
+function toggleSidebar() {
+  document.getElementById('app-sidebar').classList.toggle('show');
+}
+
+// 3. Navigation Sidebar Builder
+function buildSidebarNav(role) {
+  const container = document.getElementById('sidebar-nav-container');
+  let html = '';
+
+  if (role === 'admin') {
+    html = `
+      <div class="nav-section-label">UTAMA</div>
+      <a href="javascript:void(0)" class="nav-link active" onclick="showTab('admin-dashboard', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboard Admin</span>
+      </a>
+      <div class="nav-section-label">DATA MASTER</div>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('admin-students', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Data Siswa</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('admin-violations', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Catatan Pelanggaran</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('admin-sanctions', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kategori & Sanksi</span>
+      </a>
+      <div class="nav-section-label">LAPORAN</div>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('admin-report', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span>Rekap & Cetak Laporan</span>
+      </a>
+    `;
+  } else if (role === 'teacher') {
+    html = `
+      <div class="nav-section-label">MENU GURU / BK</div>
+      <a href="javascript:void(0)" class="nav-link active" onclick="showTab('guru-add-violation', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span>Catat Pelanggaran</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('guru-history', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/></svg>
+        <span>Riwayat Pencatatan</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('admin-students', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span>Daftar Siswa</span>
+      </a>
+    `;
+  } else if (role === 'parent') {
+    html = `
+      <div class="nav-section-label">PORTAL WALI SISWA</div>
+      <a href="javascript:void(0)" class="nav-link active" onclick="showTab('parent-dashboard', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <span>Buku Kendali Siswa</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-link" onclick="showTab('admin-sanctions', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Tata Tertib Sekolah</span>
+      </a>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+function showTab(tabName, linkElement) {
+  // Hide all panels
+  document.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('tab-' + tabName);
+  if (target) {
+    target.classList.add('active');
+  }
+
+  // Update nav link active state
+  if (linkElement) {
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
+    linkElement.classList.add('active');
+  }
+
+  // Update breadcrumb
+  const titles = {
+    'admin-dashboard': 'Dashboard Admin',
+    'admin-students': 'Data Siswa Terdaftar',
+    'admin-violations': 'Catatan Riwayat Pelanggaran',
+    'admin-sanctions': 'Matriks Kategori & Sanksi',
+    'admin-report': 'Rekapitulasi Laporan Cetak',
+    'guru-add-violation': 'Input Pelanggaran Real-Time',
+    'guru-history': 'Riwayat Pencatatan Guru',
+    'parent-dashboard': 'Buku Kendali Kedisiplinan'
+  };
+  document.getElementById('topbar-current-title').innerText = titles[tabName] || tabName;
+
+  // Auto close mobile sidebar
+  document.getElementById('app-sidebar').classList.remove('show');
+}
+
+// 4. Render Admin Dashboard
+let catChartInstance = null;
+let trendChartInstance = null;
+
+function renderAdminDashboard() {
+  const students = appState.students;
+  const violations = appState.violations;
+
+  document.getElementById('stat-total-students').innerText = students.length;
+  document.getElementById('stat-total-violations').innerText = violations.length;
+
+  const totalPoints = students.reduce((acc, s) => acc + s.points, 0);
+  const avg = (totalPoints / (students.length || 1)).toFixed(1);
+  document.getElementById('stat-avg-points').innerText = avg;
+
+  const critical = students.filter(s => s.points >= 30).length;
+  document.getElementById('stat-critical-students').innerText = critical;
+
+  // Render Top 5 students table
+  const sortedStudents = [...students].sort((a, b) => b.points - a.points).slice(0, 5);
+  const tbody = document.getElementById('admin-top-students-tbody');
+  tbody.innerHTML = sortedStudents.map(s => `
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td><code>${s.nisn}</code></td>
+      <td>${s.class_name}</td>
+      <td><span class="badge-pill ${s.points >= 30 ? 'danger' : (s.points > 0 ? 'warning' : 'success')}">${s.points} Poin</span></td>
+      <td>${getSanctionForPoints(s.points)}</td>
+      <td>${s.parent_name}</td>
+    </tr>
+  `).join('');
+
+  // Charts
+  renderCharts();
+}
+
+function renderCharts() {
+  if (typeof Chart === 'undefined') return;
+
+  const ctxCat = document.getElementById('categoryChart');
+  const ctxTrend = document.getElementById('trendChart');
+
+  if (catChartInstance) catChartInstance.destroy();
+  if (trendChartInstance) trendChartInstance.destroy();
+
+  if (ctxCat) {
+    catChartInstance = new Chart(ctxCat.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Ringan (< 15 Poin)', 'Sedang (15 - 30 Poin)', 'Berat (> 30 Poin)'],
+        datasets: [{
+          data: [8, 5, 2],
+          backgroundColor: ['#397C78', '#D6A34D', '#C66B6B'],
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+        }
+      }
+    });
+  }
+
+  if (ctxTrend) {
+    trendChartInstance = new Chart(ctxTrend.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['Juli', 'Agustus', 'September', 'Oktober', 'November'],
+        datasets: [{
+          label: 'Jumlah Kasus Tercatat',
+          data: [4, 6, 3, 5, 2],
+          borderColor: '#172B3A',
+          backgroundColor: 'rgba(23, 43, 58, 0.08)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 2 } }
+        }
+      }
+    });
+  }
+}
+
+// 5. Render Students, Violations, Sanctions Tables
+function renderStudentsTables() {
+  const tbody = document.getElementById('students-full-tbody');
+  tbody.innerHTML = appState.students.map(s => `
+    <tr>
+      <td><code>${s.nisn}</code></td>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.class_name}</td>
+      <td>${s.parent_name} (${s.phone})</td>
+      <td><span class="badge-pill ${s.points >= 30 ? 'danger' : (s.points > 0 ? 'warning' : 'success')}">${s.points} Poin</span></td>
+      <td>${s.points === 0 ? 'Tertib' : (s.points < 30 ? 'Sedang' : 'Tinggi / Kritis')}</td>
+      <td>${getSanctionForPoints(s.points)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterStudentsTable(query) {
+  const q = query.toLowerCase();
+  const rows = document.querySelectorAll('#students-full-tbody tr');
+  rows.forEach(r => {
+    r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function renderViolationsTable() {
+  const tbody = document.getElementById('violations-full-tbody');
+  tbody.innerHTML = appState.violations.map(v => `
+    <tr>
+      <td><code>${v.trx}</code></td>
+      <td>${formatIndoDate(v.date)}</td>
+      <td><strong>${v.student_name}</strong></td>
+      <td>${v.class}</td>
+      <td>${v.cat_name}</td>
+      <td><span class="badge-pill ${v.cat_type === 'Berat' ? 'danger' : (v.cat_type === 'Sedang' ? 'warning' : 'primary')}">${v.cat_type}</span></td>
+      <td><strong>+${v.points}</strong></td>
+      <td>${v.teacher}</td>
+    </tr>
+  `).join('');
+}
+
+function renderSanctionsTable() {
+  const tbody = document.getElementById('sanctions-rules-tbody');
+  tbody.innerHTML = appState.sanctionRules.map(r => `
+    <tr>
+      <td><strong>${r.range}</strong></td>
+      <td><strong>${r.name}</strong></td>
+      <td>${r.desc}</td>
+      <td><span class="badge-pill ${r.urgency === 'Kritis' ? 'danger' : (r.urgency === 'Tinggi' ? 'warning' : 'primary')}">${r.urgency}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderReportPrintTable() {
+  const tbody = document.getElementById('report-print-tbody');
+  tbody.innerHTML = appState.students.map((s, idx) => `
+    <tr>
+      <td style="text-align: center;">${idx + 1}</td>
+      <td><code>${s.nisn}</code></td>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.class_name}</td>
+      <td style="text-align: center;"><strong>${s.points}</strong></td>
+      <td>${getSanctionForPoints(s.points)}</td>
+    </tr>
+  `).join('');
+}
+
+// 6. Guru Add Violation Logic & Live WhatsApp Preview
+function initGuruAddViolationForm() {
+  // Populate categories dropdown
+  const select = document.getElementById('select-violation-category');
+  select.innerHTML = '<option value="">-- Pilih Jenis Pelanggaran --</option>' + 
+    appState.categories.map(c => `<option value="${c.id}" data-pts="${c.points}" data-name="${c.name}" data-type="${c.type}">[${c.type} &bull; ${c.points} Poin] ${c.name}</option>`).join('');
+
+  // Set default date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('input-violation-date').value = today;
+  updateLiveWaPreview();
+}
+
+function searchStudentsLive(q) {
+  const resultsBox = document.getElementById('student-search-results');
+  if (!q.trim()) {
+    resultsBox.style.display = 'none';
+    return;
+  }
+  const filtered = appState.students.filter(s => 
+    s.name.toLowerCase().includes(q.toLowerCase()) || s.nisn.includes(q)
+  );
+  if (filtered.length === 0) {
+    resultsBox.innerHTML = '<div style="padding: 10px; font-size: 12px; color: #999;">Tidak ada siswa cocok</div>';
+    resultsBox.style.display = 'block';
+    return;
+  }
+  resultsBox.innerHTML = filtered.map(s => `
+    <div class="search-result-item" onclick="selectStudentForIncident(${s.id})">
+      <div>
+        <strong>${s.name}</strong> (${s.class_name})<br>
+        <span style="font-size: 11px; color: #64748B;">NISN: ${s.nisn} &bull; Wali: ${s.parent_name}</span>
+      </div>
+      <span class="badge-pill ${s.points > 20 ? 'danger' : 'primary'}">${s.points} Pts</span>
+    </div>
+  `).join('');
+  resultsBox.style.display = 'block';
+}
+
+function selectStudentForIncident(studentId) {
+  const s = appState.students.find(item => item.id === studentId);
+  if (!s) return;
+  document.getElementById('selected-student-id').value = s.id;
+  document.getElementById('input-student-search').value = s.name;
+  document.getElementById('student-search-results').style.display = 'none';
+
+  document.getElementById('badge-student-name').innerText = s.name;
+  document.getElementById('badge-student-class').innerText = s.class_name;
+  document.getElementById('badge-student-current-pts').innerText = s.points;
+  document.getElementById('selected-student-badge').style.display = 'block';
+
+  document.getElementById('wa-recipient-name').innerText = s.parent_name;
+  document.getElementById('wa-recipient-phone').innerText = s.phone;
+
+  updateLiveWaPreview();
+}
+
+function handleCategoryChange() {
+  const select = document.getElementById('select-violation-category');
+  const opt = select.options[select.selectedIndex];
+  const pts = opt.getAttribute('data-pts') || 0;
+  document.getElementById('input-violation-points').value = pts;
+  updateLiveWaPreview();
+}
+
+function buildWaText(student, catName, pts, dateStr) {
+  const totalAccumulated = (student.points || 0) + parseInt(pts || 0);
+  const formattedDate = formatIndoDate(dateStr || new Date());
+  return `Yth. Bapak/Ibu Wali Siswa,\n\nKami informasikan bahwa siswa ${student.name} dari kelas ${student.class_name} telah tercatat melakukan pelanggaran sebagai berikut:\n\nJenis Pelanggaran: ${catName}\nTanggal: ${formattedDate}\nPoin Pelanggaran: ${pts}\nTotal Akumulasi Poin: ${totalAccumulated}\n\nMohon perhatian dan kerja sama Bapak/Ibu dalam mendukung pembinaan kedisiplinan siswa.\n\nTerima kasih.\nSMA Kartika 1-2`;
+}
+
+function updateLiveWaPreview() {
+  const sId = document.getElementById('selected-student-id').value;
+  const select = document.getElementById('select-violation-category');
+  const opt = select.options[select.selectedIndex];
+  const dateVal = document.getElementById('input-violation-date').value;
+
+  const previewBox = document.getElementById('wa-preview-text');
+
+  if (!sId || !opt || !opt.value) {
+    previewBox.innerText = 'Pilih siswa dan jenis pelanggaran pada formulir di sebelah kiri untuk melihat pratinjau pesan otomatis...';
+    return;
+  }
+
+  const s = appState.students.find(item => item.id == sId);
+  if (!s) return;
+
+  const pts = opt.getAttribute('data-pts');
+  const catName = opt.getAttribute('data-name');
+  previewBox.innerText = buildWaText(s, catName, pts, dateVal);
+}
+
+function handleRecordViolationSubmit(e) {
+  e.preventDefault();
+  const sId = parseInt(document.getElementById('selected-student-id').value);
+  const select = document.getElementById('select-violation-category');
+  const opt = select.options[select.selectedIndex];
+  const dateVal = document.getElementById('input-violation-date').value;
+  const notes = document.getElementById('input-violation-notes').value;
+
+  if (!sId || !opt.value) {
+    Toast.error('Kesalahan', 'Silakan pilih siswa dan jenis pelanggaran.');
+    return;
+  }
+
+  const s = appState.students.find(item => item.id === sId);
+  const pts = parseInt(opt.getAttribute('data-pts'));
+  const catName = opt.getAttribute('data-name');
+  const catType = opt.getAttribute('data-type');
+
+  // 1. Atomic Transaction Simulation: Update Student Points
+  s.points += pts;
+  s.active_sanction = getSanctionForPoints(s.points);
+  if (s.points >= 50) s.status = 'critical';
+  else if (s.points >= 30) s.status = 'danger';
+  else if (s.points > 0) s.status = 'warning';
+
+  // 2. Append Violation Record
+  const newTrx = 'TRX-202611-' + String(appState.violations.length + 1).padStart(4, '0');
+  const newViolation = {
+    trx: newTrx,
+    date: dateVal,
+    student_id: s.id,
+    student_name: s.name,
+    class: s.class_name,
+    cat_name: catName,
+    cat_type: catType,
+    points: pts,
+    teacher: appState.currentUser ? appState.currentUser.name : 'Guru Piket'
+  };
+  appState.violations.unshift(newViolation);
+
+  // 3. Append Notification Log
+  const waMessage = buildWaText(s, catName, pts, dateVal);
+  const newNotif = {
+    id: appState.notifications.length + 1,
+    phone: s.phone,
+    recipient: s.parent_name,
+    student: s.name,
+    status: 'Terkirim',
+    time: 'Baru saja'
+  };
+  appState.notifications.unshift(newNotif);
+
+  // 4. Save to persistent state
+  saveAppState(appState);
+
+  // 5. Toast Feedback
+  Toast.success('Transaksi Berhasil', `Catatan pelanggaran ${s.name} berhasil disimpan (+${pts} poin).`);
+
+  // 6. Open WhatsApp Simulator Dialog
+  document.getElementById('modal-wa-message-content').innerText = waMessage;
+  document.getElementById('modal-wa-simulator').style.display = 'flex';
+
+  // 7. Reset Form
+  document.getElementById('record-violation-form').reset();
+  document.getElementById('selected-student-id').value = '';
+  document.getElementById('selected-student-badge').style.display = 'none';
+  document.getElementById('input-violation-points').value = '';
+  updateLiveWaPreview();
+  renderGuruHistory();
+}
+
+function closeWaModal() {
+  document.getElementById('modal-wa-simulator').style.display = 'none';
+}
+
+function finishWaDemo() {
+  closeWaModal();
+  Toast.info('WhatsApp Gateway', 'Pesan notifikasi berhasil diterima di HP orang tua murid.');
+}
+
+function renderGuruHistory() {
+  const tbody = document.getElementById('guru-history-tbody');
+  tbody.innerHTML = appState.violations.map(v => `
+    <tr>
+      <td><code>${v.trx}</code></td>
+      <td>${formatIndoDate(v.date)}</td>
+      <td><strong>${v.student_name}</strong></td>
+      <td>${v.class}</td>
+      <td>${v.cat_name}</td>
+      <td><span class="badge-pill danger">+${v.points}</span></td>
+      <td><span class="badge-pill success">Terkirim</span></td>
+    </tr>
+  `).join('');
+}
+
+// 7. Parent Dashboard Logic
+function renderParentDashboard() {
+  const s = appState.students[0]; // Farhan
+  document.getElementById('parent-student-name').innerText = s.name;
+  document.getElementById('parent-student-nisn').innerText = s.nisn;
+  document.getElementById('parent-student-class').innerText = s.class_name;
+  document.getElementById('parent-status-badge').innerText = getSanctionForPoints(s.points);
+
+  const pct = Math.min(100, Math.round((s.points / 100) * 100));
+  document.getElementById('parent-gauge-pts-text').innerText = `${s.points} / 100 Poin (${pct}%)`;
+  document.getElementById('parent-gauge-bar').style.width = pct + '%';
+  document.getElementById('parent-gauge-bar').style.backgroundColor = s.points >= 50 ? '#C66B6B' : (s.points >= 25 ? '#D6A34D' : '#397C78');
+
+  // Filter violations for this student
+  const studentViolations = appState.violations.filter(v => v.student_id === s.id);
+  const tbody = document.getElementById('parent-violations-tbody');
+  if (studentViolations.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #10B981; padding: 24px;">Alhamdulillah, putra/putri Anda tidak memiliki catatan pelanggaran.</td></tr>';
+  } else {
+    tbody.innerHTML = studentViolations.map(v => `
+      <tr>
+        <td>${formatIndoDate(v.date)}</td>
+        <td><strong>${v.cat_name}</strong></td>
+        <td><span class="badge-pill ${v.cat_type === 'Berat' ? 'danger' : 'warning'}">${v.cat_type}</span></td>
+        <td><strong class="text-danger">+${v.points}</strong></td>
+        <td>${v.teacher} (Bimbingan Terjadwal)</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// 8. Notifications Log Modal
+function showNotificationLog() {
+  const list = document.getElementById('notif-logs-list');
+  list.innerHTML = appState.notifications.map(n => `
+    <div style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>Pesan Terkirim ke ${n.recipient}</strong> (${n.phone})<br>
+        <span style="font-size: 11px; color: #64748B;">Siswa: ${n.student} &bull; Waktu: ${n.time}</span>
+      </div>
+      <span class="badge-pill success">Sukses WA</span>
+    </div>
+  `).join('');
+  document.getElementById('modal-notif-history').style.display = 'flex';
+}
+
+function closeNotifModal() {
+  document.getElementById('modal-notif-history').style.display = 'none';
+}
+
+// Run init on DOM Ready
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+
+</body>
+</html>
