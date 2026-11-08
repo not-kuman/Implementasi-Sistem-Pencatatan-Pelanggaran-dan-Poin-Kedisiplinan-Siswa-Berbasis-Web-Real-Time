@@ -10,6 +10,12 @@ date_default_timezone_set('Asia/Jakarta');
 
 // Start Session if not already active
 if (session_status() === PHP_SESSION_NONE) {
+    if (getenv('VERCEL') || !@is_writable(session_save_path())) {
+        $temp_dir = sys_get_temp_dir();
+        if ($temp_dir && @is_writable($temp_dir)) {
+            @session_save_path($temp_dir);
+        }
+    }
     // Set secure cookie params
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_only_cookies', 1);

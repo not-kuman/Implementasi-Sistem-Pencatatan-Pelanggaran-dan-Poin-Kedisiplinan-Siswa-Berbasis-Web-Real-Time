@@ -224,12 +224,43 @@ mysql -u root < database/seeder.sql
 
 ---
 
-## 8. PANDUAN DEPLOYMENT ONLINE (FULL-STACK PHP & MYSQL)
+## 8. PANDUAN DEPLOYMENT ONLINE (VERCEL & CLOUD HOSTING)
 
-Aplikasi dibangun menggunakan arsitektur **PHP Native & MySQL Relasional**. Untuk menjalankan website secara online di internet, gunakan salah satu opsi hosting server berikut:
+Aplikasi dibangun menggunakan arsitektur **PHP Native & MySQL Relasional**. Seluruh berkas konfigurasi untuk deployment online telah dipersiapkan:
 
-### Opsi 1: Shared Web Hosting (cPanel / InfinityFree / Hostinger / Niagahoster)
-1. Buat database MySQL baru pada panel hosting Anda (misal: `db_kartika_disiplin`).
+### Opsi 1: Vercel Serverless Deployment (Rekomendasi Utama)
+Aplikasi telah dilengkapi berkas konfigurasi [`vercel.json`](vercel.json) dan Front-Controller Router [`api/index.php`](api/index.php) menggunakan runtime `vercel-php@0.8.0`.
+
+#### Langkah Deploy ke Vercel:
+1. **Siapkan Database Cloud MySQL Gratis:**
+   Karena serverless Vercel tidak menyimpan database MySQL lokal, gunakan salah satu penyedia MySQL cloud gratis:
+   - [Aiven for MySQL](https://aiven.io/) (Free tier)
+   - [TiDB Cloud](https://tidbcloud.com/) (Serverless MySQL gratis)
+   - [Railway.app](https://railway.app/) (Database MySQL gratis)
+   - [Clever Cloud](https://www.clever-cloud.com/) (MySQL gratis)
+   *Setelah database dibuat, impor berkas `database/schema.sql` dan `database/seeder.sql` ke database cloud tersebut.*
+
+2. **Hubungkan Repositori ke Vercel:**
+   - Kunjungi [Vercel Dashboard](https://vercel.com) dan login menggunakan akun GitHub Anda.
+   - Klik **"Add New..."** &gt; **"Project"**.
+   - Pilih repositori `Implementasi-Sistem-Pencatatan-Pelanggaran-dan-Poin-Kedisiplinan-Siswa-Berbasis-Web-Real-Time` lalu klik **Import**.
+
+3. **Masukkan Environment Variables di Vercel:**
+   Pada bagian **Environment Variables**, isi konfigurasi database cloud:
+   - `DB_HOST`: Host server MySQL cloud Anda
+   - `DB_PORT`: Port MySQL (biasanya `3306` atau `4000`)
+   - `DB_NAME`: Nama database (misal: `db_kartika_disiplin`)
+   - `DB_USER`: Username database
+   - `DB_PASS`: Password database
+   *(Atau masukkan langsung satu variabel `DATABASE_URL` jika penyedia cloud menyediakannya)*
+
+4. **Klik "Deploy":**
+   Vercel akan otomatis memproses dan menayangkan website Anda di URL publik seperti `https://[nama-proyek].vercel.app`.
+
+---
+
+### Opsi 2: Shared Web Hosting (cPanel / InfinityFree / Hostinger)
+1. Buat database MySQL baru pada panel hosting Anda.
 2. Masuk ke **phpMyAdmin** hosting, lalu impor:
    - `database/schema.sql`
    - `database/seeder.sql`
@@ -237,7 +268,7 @@ Aplikasi dibangun menggunakan arsitektur **PHP Native & MySQL Relasional**. Untu
 4. Sesuaikan konfigurasi koneksi basis data di file `config/database.php` (DB_HOST, DB_USER, DB_PASS, DB_NAME).
 5. Website siap diakses secara online via domain / subdomain Anda.
 
-### Opsi 2: Cloud Container Deployment (Docker / Render.com / Railway)
+### Opsi 3: Cloud Container Deployment (Docker / Render.com / Railway)
 Aplikasi telah dilengkapi berkas konfigurasi cloud siap pakai:
 - **Docker Compose:** Jalankan `docker-compose up -d` di server / VPS Anda (port `8080`). Skema database dan seeder akan otomatis dimuat.
 - **Render.com:** Hubungkan repositori GitHub Anda dan impor `render.yaml`. Render akan otomatis membuat web service PHP 8.2 dan database MySQL gratis.

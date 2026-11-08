@@ -1,0 +1,12 @@
+.git
+.gitignore
+.github
+Dockerfile
+docker-compose.yml
+dokumen_penelitian.docx
+dokumen_penelitian.pdf
+dokumen_teks.txt
+laporan_lengkap.txt
+tests/
+test_system.php
+render.yaml
