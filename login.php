@@ -23,6 +23,11 @@ if (isset($_GET['error'])) {
     }
 }
 
+$db_configured = true;
+if (env_get('VERCEL') && (DB_HOST === '127.0.0.1' || DB_HOST === 'localhost' || empty(env_get('DB_HOST')))) {
+    $db_configured = false;
+}
+
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -100,6 +105,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1 class="auth-title">Masuk ke Portal</h1>
         <p class="auth-desc">Gunakan kredensial akun terdaftar Anda untuk melanjutkan.</p>
       </div>
+
+      <?php if (!$db_configured): ?>
+        <div class="auth-alert-error" style="background-color: #FFFBEB; border-color: #FCD34D; color: #92400E; margin-bottom: 20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div style="font-size: 11.5px; line-height: 1.5;">
+            <strong>Database MySQL Belum Dikonfigurasi di Vercel:</strong><br>
+            Aplikasi mendeteksi <code>DB_HOST</code> masih kosong / localhost. Silakan buka <strong>Project Settings &gt; Environment Variables</strong> di Vercel Dashboard, masukkan variabel database (Host, Port, User, Pass, Name), lalu lakukan <strong>Redeploy</strong>.
+          </div>
+        </div>
+      <?php endif; ?>
 
       <?php if (!empty($error_message)): ?>
         <div class="auth-alert-error">

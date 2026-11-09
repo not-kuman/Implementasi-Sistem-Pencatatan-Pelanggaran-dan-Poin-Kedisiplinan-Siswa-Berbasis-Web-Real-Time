@@ -19,48 +19,52 @@ function current_user() {
 
     if (!is_logged_in()) return null;
 
-    $pdo = get_db_connection();
-    $stmt = $pdo->prepare("
-        SELECT id, username, full_name, role, status 
-        FROM users 
-        WHERE id = ? AND status = 'active'
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch();
+    try {
+        $pdo = get_db_connection();
+        $stmt = $pdo->prepare("
+            SELECT id, username, full_name, role, status 
+            FROM users 
+            WHERE id = ? AND status = 'active'
+        ");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch();
 
-    if ($user) {
-        // Attach role-specific metadata
-        if ($user['role'] === 'teacher') {
-            $stmtT = $pdo->prepare("SELECT id as teacher_id, nip, nama_guru, jabatan, no_telp FROM teachers WHERE user_id = ?");
-            $stmtT->execute([$user['id']]);
-            $t = $stmtT->fetch();
-            if ($t) {
-                $user['teacher_id'] = $t['teacher_id'];
-                $user['nip'] = $t['nip'];
-                $user['nama_guru'] = $t['nama_guru'];
-                $user['jabatan'] = $t['jabatan'];
-            }
-        } elseif ($user['role'] === 'parent') {
-            $stmtP = $pdo->prepare("
-                SELECT p.id as parent_id, p.student_id, p.nama_wali, p.hubungan, p.no_telp,
-                       s.nama_lengkap as nama_siswa, s.nis, s.total_poin, c.nama_kelas
-                FROM parents p
-                JOIN students s ON p.student_id = s.id
-                JOIN classes c ON s.class_id = c.id
-                WHERE p.user_id = ?
-            ");
-            $stmtP->execute([$user['id']]);
-            $p = $stmtP->fetch();
-            if ($p) {
-                $user['parent_id'] = $p['parent_id'];
-                $user['student_id'] = $p['student_id'];
-                $user['nama_wali'] = $p['nama_wali'];
-                $user['nama_siswa'] = $p['nama_siswa'];
-                $user['nis_siswa'] = $p['nis'];
-                $user['kelas_siswa'] = $p['nama_kelas'];
-                $user['total_poin_siswa'] = $p['total_poin'];
+        if ($user) {
+            // Attach role-specific metadata
+            if ($user['role'] === 'teacher') {
+                $stmtT = $pdo->prepare("SELECT id as teacher_id, nip, nama_guru, jabatan, no_telp FROM teachers WHERE user_id = ?");
+                $stmtT->execute([$user['id']]);
+                $t = $stmtT->fetch();
+                if ($t) {
+                    $user['teacher_id'] = $t['teacher_id'];
+                    $user['nip'] = $t['nip'];
+                    $user['nama_guru'] = $t['nama_guru'];
+                    $user['jabatan'] = $t['jabatan'];
+                }
+            } elseif ($user['role'] === 'parent') {
+                $stmtP = $pdo->prepare("
+                    SELECT p.id as parent_id, p.student_id, p.nama_wali, p.hubungan, p.no_telp,
+                           s.nama_lengkap as nama_siswa, s.nis, s.total_poin, c.nama_kelas
+                    FROM parents p
+                    JOIN students s ON p.student_id = s.id
+                    JOIN classes c ON s.class_id = c.id
+                    WHERE p.user_id = ?
+                ");
+                $stmtP->execute([$user['id']]);
+                $p = $stmtP->fetch();
+                if ($p) {
+                    $user['parent_id'] = $p['parent_id'];
+                    $user['student_id'] = $p['student_id'];
+                    $user['nama_wali'] = $p['nama_wali'];
+                    $user['nama_siswa'] = $p['nama_siswa'];
+                    $user['nis_siswa'] = $p['nis'];
+                    $user['kelas_siswa'] = $p['nama_kelas'];
+                    $user['total_poin_siswa'] = $p['total_poin'];
+                }
             }
         }
+    } catch (Throwable $e) {
+        return null;
     }
 
     return $user;

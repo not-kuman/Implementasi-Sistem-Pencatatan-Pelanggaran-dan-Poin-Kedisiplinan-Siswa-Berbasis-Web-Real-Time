@@ -13,17 +13,20 @@ function e($value) {
 // Retrieve setting from database with static cache
 function get_setting($key, $default = '') {
     static $settings_cache = null;
-    $pdo = get_db_connection();
 
     if ($settings_cache === null) {
         $settings_cache = [];
         try {
-            $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings");
-            while ($row = $stmt->fetch()) {
-                $settings_cache[$row['setting_key']] = $row['setting_value'];
+            $pdo = get_db_connection();
+            if ($pdo) {
+                $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings");
+                while ($row = $stmt->fetch()) {
+                    $settings_cache[$row['setting_key']] = $row['setting_value'];
+                }
             }
-        } catch (Exception $e) {
-            // Table might not exist yet
+        } catch (Throwable $e) {
+            // Database is unreachable or table not migrated yet
+            // Fall back gracefully to $default without throwing fatal error
         }
     }
 
