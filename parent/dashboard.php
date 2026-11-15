@@ -61,7 +61,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="page-header">
   <div>
     <h1 class="page-title">Pemantauan Kedisiplinan: <?= e($child['nama_lengkap']) ?></h1>
-    <p class="page-subtitle">Transparansi rekam jejak tata tertib peserta didik SMA Kartika 1-2 Medan</p>
+    <p class="page-subtitle">Transparansi rekam jejak tata tertib peserta didik &bull; <?= e(APP_NAME) ?></p>
   </div>
   <div class="page-actions">
     <a href="<?= BASE_URL ?>/parent/profile.php" class="btn btn-secondary">

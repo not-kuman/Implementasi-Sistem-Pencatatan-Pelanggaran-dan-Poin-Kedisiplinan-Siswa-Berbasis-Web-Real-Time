@@ -47,13 +47,55 @@ $stmtRecent = $pdo->query("
 ");
 $recent_activities = $stmtRecent->fetchAll();
 
+// Server-side pre-aggregation for Top Categories
+$stmtCat = $pdo->query("
+    SELECT vc.id, vc.nama_pelanggaran, vc.tingkat, vc.poin, COUNT(vr.id) as total_kasus
+    FROM violation_records vr
+    JOIN violation_categories vc ON vr.category_id = vc.id
+    GROUP BY vc.id, vc.nama_pelanggaran, vc.tingkat, vc.poin
+    ORDER BY total_kasus DESC
+    LIMIT 6
+");
+$top_categories = $stmtCat->fetchAll();
+
+// Server-side pre-aggregation for Monthly Trend
+$stmtTrend = $pdo->query("
+    SELECT DATE_FORMAT(tanggal_kejadian, '%Y-%m') as ym, COUNT(id) as count
+    FROM violation_records
+    GROUP BY DATE_FORMAT(tanggal_kejadian, '%Y-%m')
+    ORDER BY ym ASC
+    LIMIT 12
+");
+$trend_rows = $stmtTrend->fetchAll();
+$indo_months = [
+    '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+    '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu',
+    '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'
+];
+$trend_labels = [];
+$trend_counts = [];
+$prev_c = null;
+$latest_diff = 0;
+foreach ($trend_rows as $tr) {
+    $parts = explode('-', $tr['ym']);
+    $m = $parts[1] ?? '01';
+    $y = $parts[0] ?? date('Y');
+    $trend_labels[] = ($indo_months[$m] ?? $m) . ' ' . $y;
+    $c = (int)$tr['count'];
+    $trend_counts[] = $c;
+    if ($prev_c !== null) {
+        $latest_diff = $c - $prev_c;
+    }
+    $prev_c = $c;
+}
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="page-header">
   <div>
     <h1 class="page-title">Pusat Komando Kedisiplinan</h1>
-    <p class="page-subtitle">Ringkasan analitis rekam jejak tata tertib siswa <?= e(SCHOOL_NAME) ?></p>
+    <p class="page-subtitle"><?= e(APP_SUBTITLE) ?> &mdash; Pemantauan tata tertib terpusat</p>
   </div>
   <div class="page-actions">
     <button type="button" class="btn btn-secondary" id="btn-refresh-stats">
@@ -129,9 +171,9 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Two Charts Section (Bar Chart & Line Chart) -->
+<!-- Two Charts Section (Horizontal Bar Chart & Line Chart) -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; margin-bottom: 24px;">
-  <!-- Bar Chart: Jenis Pelanggaran Terbanyak -->
+  <!-- Horizontal Bar Chart: Kategori Pelanggaran Terbanyak -->
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
       <div>
@@ -139,15 +181,44 @@ require_once __DIR__ . '/../includes/header.php';
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           Kategori Pelanggaran Terbanyak
         </h2>
-        <span class="card-subtitle-styled">Distribusi insiden berdasarkan jenis pelanggaran</span>
+        <span class="card-subtitle-styled">Distribusi insiden berdasarkan frekuensi jenis pelanggaran</span>
       </div>
     </div>
-    <div class="card-body-styled" style="height: 300px; position: relative;">
-      <canvas id="chartCategories"></canvas>
+    <div class="card-body-styled">
+      <?php if (empty($top_categories)): ?>
+        <div class="empty-state-box">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>Belum ada data pelanggaran pada periode ini.</p>
+        </div>
+      <?php else: ?>
+        <div style="height: 220px; position: relative;">
+          <canvas id="chartCategories"></canvas>
+        </div>
+        <div class="category-breakdown-list" id="category-breakdown-container">
+          <?php foreach ($top_categories as $cat): 
+            $pct = $total_records > 0 ? round(($cat['total_kasus'] / $total_records) * 100, 1) : 0;
+            $sev_class = 'badge-' . strtolower($cat['tingkat']);
+          ?>
+            <div class="cat-summary-row">
+              <div class="cat-summary-info">
+                <span class="badge <?= $sev_class ?>"><?= e($cat['tingkat']) ?></span>
+                <span class="cat-name" title="<?= e($cat['nama_pelanggaran']) ?>"><?= e($cat['nama_pelanggaran']) ?></span>
+              </div>
+              <div class="cat-summary-metrics">
+                <span class="cat-points"><?= (int)$cat['poin'] ?> Poin</span>
+                <span class="cat-count"><strong><?= (int)$cat['total_kasus'] ?></strong> kasus</span>
+                <span class="cat-pct">(<?= $pct ?>%)</span>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 
-  <!-- Line Chart: Tren Pelanggaran Per Waktu -->
+  <!-- Line Chart: Tren Pelanggaran Bulanan -->
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
       <div>
@@ -157,9 +228,25 @@ require_once __DIR__ . '/../includes/header.php';
         </h2>
         <span class="card-subtitle-styled">Fluktuasi kejadian pelanggaran sepanjang waktu</span>
       </div>
+      <?php if (!empty($trend_rows) && count($trend_rows) >= 2): ?>
+        <span class="trend-mom-pill <?= $latest_diff > 0 ? 'up' : ($latest_diff < 0 ? 'down' : 'neutral') ?>">
+          <?= $latest_diff > 0 ? '▲ +' . $latest_diff . ' vs bln lalu' : ($latest_diff < 0 ? '▼ ' . $latest_diff . ' vs bln lalu' : '— Tetap vs bln lalu') ?>
+        </span>
+      <?php endif; ?>
     </div>
-    <div class="card-body-styled" style="height: 300px; position: relative;">
-      <canvas id="chartTrend"></canvas>
+    <div class="card-body-styled">
+      <?php if (empty($trend_rows)): ?>
+        <div class="empty-state-box">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <p>Belum ada data tren kejadian pada periode ini.</p>
+        </div>
+      <?php else: ?>
+        <div style="height: 290px; position: relative;">
+          <canvas id="chartTrend"></canvas>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 </div>
@@ -287,11 +374,135 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php 
+$initial_cat_json = json_encode([
+    'labels' => array_column($top_categories, 'nama_pelanggaran'),
+    'data' => array_map('intval', array_column($top_categories, 'total_kasus')),
+    'percentages' => array_map(function($c) use ($total_records) {
+        return $total_records > 0 ? round(($c['total_kasus'] / $total_records) * 100, 1) : 0;
+    }, $top_categories)
+]);
+$initial_trend_json = json_encode([
+    'labels' => $trend_labels,
+    'data' => $trend_counts
+]);
+
 $extra_js = '
 <script src="' . BASE_URL . '/assets/vendor/chart.min.js"></script>
 <script>
 let catChartInstance = null;
 let trendChartInstance = null;
+
+const initialCatData = ' . $initial_cat_json . ';
+const initialTrendData = ' . $initial_trend_json . ';
+
+function renderCategoriesChart(catData) {
+  const canvas = document.getElementById("chartCategories");
+  if (!canvas || !catData || !catData.labels || catData.labels.length === 0) return;
+  const ctxCat = canvas.getContext("2d");
+  if (catChartInstance) catChartInstance.destroy();
+
+  catChartInstance = new Chart(ctxCat, {
+    type: "bar",
+    data: {
+      labels: catData.labels.map(l => l.length > 28 ? l.substring(0, 25) + "..." : l),
+      datasets: [{
+        label: "Jumlah Kasus",
+        data: catData.data,
+        backgroundColor: "#397C78",
+        hoverBackgroundColor: "#2C6360",
+        borderRadius: 3,
+        barThickness: 16
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#172B3A",
+          titleFont: { family: "Plus Jakarta Sans", size: 12 },
+          bodyFont: { family: "Plus Jakarta Sans", size: 12 },
+          padding: 10,
+          callbacks: {
+            label: function(context) {
+              const val = context.raw || 0;
+              const pct = (catData.percentages && catData.percentages[context.dataIndex]) ? catData.percentages[context.dataIndex] : 0;
+              return " " + val + " kasus (" + pct + "% dari total)";
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: { precision: 0, font: { family: "Plus Jakarta Sans", size: 10 }, color: "#64748B" },
+          grid: { color: "#F1F5F9" }
+        },
+        y: {
+          ticks: { font: { family: "Plus Jakarta Sans", size: 10.5 }, color: "#172B3A" },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+function renderTrendChart(trendData) {
+  const canvas = document.getElementById("chartTrend");
+  if (!canvas || !trendData || !trendData.labels || trendData.labels.length === 0) return;
+  const ctxTrend = canvas.getContext("2d");
+  if (trendChartInstance) trendChartInstance.destroy();
+
+  trendChartInstance = new Chart(ctxTrend, {
+    type: "line",
+    data: {
+      labels: trendData.labels,
+      datasets: [{
+        label: "Insiden Pelanggaran",
+        data: trendData.data,
+        borderColor: "#172B3A",
+        backgroundColor: "rgba(23, 43, 58, 0.04)",
+        borderWidth: 2,
+        pointBackgroundColor: "#D6A34D",
+        pointBorderColor: "#FFFFFF",
+        pointBorderWidth: 1.5,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#172B3A",
+          padding: 10,
+          callbacks: {
+            label: function(context) {
+              return " " + context.raw + " insiden kejadian";
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0, font: { family: "Plus Jakarta Sans", size: 10 }, color: "#64748B" },
+          grid: { color: "#F1F5F9", drawBorder: false }
+        },
+        x: {
+          ticks: { font: { family: "Plus Jakarta Sans", size: 10.5 }, color: "#172B3A" },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
 
 async function loadDashboardData() {
   try {
@@ -299,99 +510,41 @@ async function loadDashboardData() {
     if (!res.success) return;
 
     // Update Metrics
-    document.getElementById("stat-students").textContent = Number(res.metrics.total_students).toLocaleString();
-    document.getElementById("stat-teachers").textContent = Number(res.metrics.total_teachers).toLocaleString();
-    document.getElementById("stat-classes").textContent = Number(res.metrics.total_classes).toLocaleString();
-    document.getElementById("stat-records").textContent = Number(res.metrics.total_records).toLocaleString();
-    document.getElementById("stat-points").textContent = Number(res.metrics.total_points).toLocaleString();
+    if (res.metrics) {
+      document.getElementById("stat-students").textContent = Number(res.metrics.total_students).toLocaleString();
+      document.getElementById("stat-teachers").textContent = Number(res.metrics.total_teachers).toLocaleString();
+      document.getElementById("stat-classes").textContent = Number(res.metrics.total_classes).toLocaleString();
+      document.getElementById("stat-records").textContent = Number(res.metrics.total_records).toLocaleString();
+      document.getElementById("stat-points").textContent = Number(res.metrics.total_points).toLocaleString();
+    }
 
-    // Render Bar Chart
-    const ctxCat = document.getElementById("chartCategories").getContext("2d");
-    if (catChartInstance) catChartInstance.destroy();
-    catChartInstance = new Chart(ctxCat, {
-      type: "bar",
-      data: {
-        labels: res.charts.categories.labels.map(l => l.length > 25 ? l.substring(0, 22) + "..." : l),
-        datasets: [{
-          label: "Jumlah Kasus",
-          data: res.charts.categories.data,
-          backgroundColor: "#397C78",
-          borderRadius: 4,
-          maxBarThickness: 36
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0, font: { family: "Plus Jakarta Sans" } },
-            grid: { color: "#F1F5F9" }
-          },
-          x: {
-            ticks: { font: { family: "Plus Jakarta Sans", size: 10 } },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-
-    // Render Line Chart
-    const ctxTrend = document.getElementById("chartTrend").getContext("2d");
-    if (trendChartInstance) trendChartInstance.destroy();
-    trendChartInstance = new Chart(ctxTrend, {
-      type: "line",
-      data: {
-        labels: res.charts.trend.labels,
-        datasets: [{
-          label: "Tren Insiden Pelanggaran",
-          data: res.charts.trend.data,
-          borderColor: "#172B3A",
-          backgroundColor: "rgba(23, 43, 58, 0.05)",
-          borderWidth: 2.2,
-          fill: true,
-          tension: 0.3,
-          pointBackgroundColor: "#D6A34D",
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0, font: { family: "Plus Jakarta Sans" } },
-            grid: { color: "#F1F5F9" }
-          },
-          x: {
-            ticks: { font: { family: "Plus Jakarta Sans" } },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-
+    // Render Charts
+    if (res.charts) {
+      if (res.charts.categories) renderCategoriesChart(res.charts.categories);
+      if (res.charts.trend) renderTrendChart(res.charts.trend);
+    }
   } catch (err) {
     console.error("Dashboard refresh error:", err);
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadDashboardData();
-  document.getElementById("btn-refresh-stats").addEventListener("click", () => {
-    loadDashboardData();
-    Toast.info("Pembaruan", "Data statistik berhasil disinkronkan.");
-  });
+  // Instant render from server-side data
+  renderCategoriesChart(initialCatData);
+  renderTrendChart(initialTrendData);
 
-  // Auto-sync polling every 30 seconds
+  // Background refresh
+  loadDashboardData();
+
+  const refreshBtn = document.getElementById("btn-refresh-stats");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      loadDashboardData();
+      Toast.info("Pembaruan", "Data statistik berhasil disinkronkan.");
+    });
+  }
+
+  // Polling every 30 seconds
   setInterval(loadDashboardData, 30000);
 });
 </script>

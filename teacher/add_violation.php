@@ -181,7 +181,7 @@ require_once __DIR__ . '/../includes/header.php';
             MODE DEMO SIMULATOR AKTIF
           </div>
           <div style="font-size: 11px; color: #54656F; margin-bottom: 6px;">
-            Format resmi sesuai standar penelitian SMA Kartika 1-2:
+            Format notifikasi resmi kedisiplinan:
           </div>
           <div class="wa-bubble" id="wa-preview-text">Yth. Bapak/Ibu Wali Siswa,
 
@@ -195,7 +195,7 @@ Total Akumulasi Poin: [Total Poin]
 Mohon perhatian dan kerja sama Bapak/Ibu dalam mendukung pembinaan kedisiplinan siswa.
 
 Terima kasih.
-SMA Kartika 1-2</div>
+<?= e(APP_NAME) ?></div>
         </div>
       </div>
     </div>
@@ -447,7 +447,7 @@ Total Akumulasi Poin: ${projectedTotal}
 Mohon perhatian dan kerja sama Bapak/Ibu dalam mendukung pembinaan kedisiplinan siswa.
 
 Terima kasih.
-SMA Kartika 1-2`;
+<?= json_encode(APP_NAME) ?>.replace(/^"|"$/g, '');
 
     document.getElementById('wa-preview-text').textContent = waText;
 

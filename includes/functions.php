@@ -2,8 +2,9 @@
 /**
  * Global Utility Functions
  * Sistem Informasi Pencatatan Pelanggaran dan Poin Kedisiplinan Siswa
- * SMA Kartika 1-2 Medan
  */
+
+require_once __DIR__ . '/../config/app.php';
 
 // Escape HTML output safely
 function e($value) {
@@ -135,7 +136,7 @@ function build_wa_message($student_name, $class_name, $violation_name, $date_for
            "Total Akumulasi Poin: {$total_points}\n\n" .
            "Mohon perhatian dan kerja sama Bapak/Ibu dalam mendukung pembinaan kedisiplinan siswa.\n\n" .
            "Terima kasih.\n" .
-           "SMA Kartika 1-2";
+           APP_NAME;
 }
 
 // Dispatch WhatsApp Notification (Handles DEMO Simulation and Gateway integration)

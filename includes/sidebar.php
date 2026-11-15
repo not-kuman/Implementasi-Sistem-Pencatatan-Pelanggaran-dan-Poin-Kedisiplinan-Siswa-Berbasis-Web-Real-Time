@@ -11,11 +11,11 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
 <aside class="app-sidebar" id="app-sidebar">
   <div class="sidebar-header">
     <div class="sidebar-logo">
-      <img src="<?= BASE_URL ?>/assets/images/logo-kartika.svg" alt="Logo SMA Kartika" style="width: 32px; height: 32px;">
+      <img src="<?= BASE_URL ?>/assets/images/logo.svg" alt="Logo Sistem Informasi Kedisiplinan" style="width: 32px; height: 32px;">
     </div>
     <div class="sidebar-brand-text">
-      <span class="sidebar-brand-title"><?= e(SCHOOL_NAME) ?></span>
-      <span class="sidebar-brand-sub">Sistem Kedisiplinan Real-Time</span>
+      <span class="sidebar-brand-title"><?= e(APP_NAME) ?></span>
+      <span class="sidebar-brand-sub"><?= e(APP_SUBTITLE) ?></span>
     </div>
   </div>
 

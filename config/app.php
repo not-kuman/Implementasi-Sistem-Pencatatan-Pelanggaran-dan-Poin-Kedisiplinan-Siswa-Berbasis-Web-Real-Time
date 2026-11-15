@@ -23,8 +23,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // App Information
-define('APP_NAME', 'SIM Kedisiplinan Siswa');
-define('SCHOOL_NAME', 'SMA Kartika 1-2 Medan');
+define('APP_NAME', 'Sistem Informasi Kedisiplinan Siswa');
+define('APP_SUBTITLE', 'Pencatatan Pelanggaran dan Poin Kedisiplinan');
+define('INSTITUTION_NAME', 'Sistem Informasi Kedisiplinan Siswa');
+define('SCHOOL_NAME', 'Sistem Informasi Kedisiplinan Siswa');
 define('APP_VERSION', '1.0.0');
 
 // Base URL detection

@@ -48,7 +48,7 @@ $where_sql = implode(" AND ", $where);
 // Export CSV handler
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=Rekap_Pelanggaran_SMA_Kartika_' . date('Ymd_His') . '.csv');
+    header('Content-Disposition: attachment; filename=Rekap_Pelanggaran_Kedisiplinan_' . date('Ymd_His') . '.csv');
     $out = fopen('php://output', 'w');
     fputs($out, "\xEF\xBB\xBF");
     fputcsv($out, ['No', 'Kode TRX', 'Tanggal', 'Waktu', 'NIS', 'Nama Siswa', 'Kelas', 'Jenis Pelanggaran', 'Tingkat', 'Poin', 'Tempat Kejadian', 'Keterangan', 'Guru Pencatat', 'Status Tindak Lanjut']);
@@ -189,19 +189,19 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- PRINTABLE DOCUMENT CONTAINER -->
 <div class="surface-card" style="padding: 30px;">
-  <!-- KOP SURAT RESMI SMA KARTIKA 1-2 MEDAN -->
+  <!-- KOP LAPORAN RESMI SISTEM INFORMASI KEDISIPLINAN -->
   <div style="text-align: center; border-bottom: 3px double #172B3A; padding-bottom: 14px; margin-bottom: 24px; position: relative;">
-    <div style="font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #475569;">
-      YAYASAN KARTIKA JAYA CABANG I BUKIT BARISAN
+    <div style="font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #475569;">
+      PORTAL ADMINISTRASI & PEMBINAAN KESISWAAN TERPADU
     </div>
-    <div style="font-size: 20px; font-weight: 800; color: #172B3A; letter-spacing: 0.5px; margin-top: 2px;">
-      SMA KARTIKA 1-2 MEDAN
+    <div style="font-size: 19px; font-weight: 800; color: #172B3A; letter-spacing: 0.5px; margin-top: 2px;">
+      <?= e(APP_NAME) ?>
     </div>
     <div style="font-size: 12px; color: #334155; margin-top: 4px;">
-      <?= e(get_setting('school_address', 'Jl. Brigjend Katamso No. 235, Medan Maimun, Kota Medan, Sumatera Utara 20158')) ?>
+      <?= e(APP_SUBTITLE) ?> &bull; Tahun Ajaran <?= e(get_setting('academic_year', '2026/2027')) ?>
     </div>
-    <div style="font-size: 11.5px; color: #64748B;">
-      Telepon: <?= e(get_setting('school_phone', '(061) 7864321')) ?> &bull; Email: <?= e(get_setting('school_email', 'info@kartika12medan.sch.id')) ?>
+    <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
+      Dokumen Rekapitulasi Resmi Rekam Jejak Pelanggaran dan Poin Kedisiplinan Peserta Didik
     </div>
   </div>
 
@@ -270,14 +270,14 @@ require_once __DIR__ . '/../includes/header.php';
   <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; page-break-inside: avoid;">
     <div style="text-align: center; font-size: 12.5px;">
       <div>Mengetahui,</div>
-      <div style="font-weight: 600;">Kepala SMA Kartika 1-2 Medan</div>
+      <div style="font-weight: 600;">Kepala Sekolah</div>
       <div style="height: 70px;"></div>
       <div style="font-weight: 700; text-decoration: underline; color: #172B3A;">Dra. Hj. Nur Asyiah, M.Pd</div>
       <div style="font-size: 11px; color: #64748B;">NIP. 196807151994032001</div>
     </div>
 
     <div style="text-align: center; font-size: 12.5px;">
-      <div>Medan, <?= format_date_id(date('Y-m-d')) ?></div>
+      <div><?= format_date_id(date('Y-m-d')) ?></div>
       <div style="font-weight: 600;">Koordinator Bimbingan & Konseling</div>
       <div style="height: 70px;"></div>
       <div style="font-weight: 700; text-decoration: underline; color: #172B3A;">Drs. Hendra Gunawan, M.Pd</div>

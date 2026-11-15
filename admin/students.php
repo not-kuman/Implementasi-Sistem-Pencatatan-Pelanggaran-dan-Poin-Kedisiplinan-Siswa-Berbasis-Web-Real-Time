@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle Export to CSV
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=Data_Siswa_SMA_Kartika_' . date('Ymd_His') . '.csv');
+    header('Content-Disposition: attachment; filename=Data_Siswa_Kedisiplinan_' . date('Ymd_His') . '.csv');
     $output = fopen('php://output', 'w');
     // BOM for excel
     fputs($output, "\xEF\xBB\xBF");

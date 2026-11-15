@@ -30,43 +30,77 @@ if ($user['role'] === 'admin') {
         $severity_breakdown[$row['tingkat']] = (int)$row['count'];
     }
 
-    // 3. Top Categories (Bar Chart Data)
+    // 3. Top Categories (Horizontal Bar Chart Data)
     $stmtTopCat = $pdo->query("
-        SELECT vc.nama_pelanggaran, vc.tingkat, COUNT(vr.id) as total_kasus
+        SELECT vc.id, vc.nama_pelanggaran, vc.tingkat, vc.poin, COUNT(vr.id) as total_kasus
         FROM violation_records vr
         JOIN violation_categories vc ON vr.category_id = vc.id
-        GROUP BY vc.id
+        GROUP BY vc.id, vc.nama_pelanggaran, vc.tingkat, vc.poin
         ORDER BY total_kasus DESC
-        LIMIT 6
+        LIMIT 8
     ");
     $chart_categories = [
         'labels' => [],
         'data' => [],
-        'levels' => []
+        'percentages' => [],
+        'levels' => [],
+        'points' => [],
+        'items' => []
     ];
     while ($r = $stmtTopCat->fetch()) {
+        $count = (int)$r['total_kasus'];
+        $pct = $total_records > 0 ? round(($count / $total_records) * 100, 1) : 0;
         $chart_categories['labels'][] = $r['nama_pelanggaran'];
-        $chart_categories['data'][] = (int)$r['total_kasus'];
+        $chart_categories['data'][] = $count;
+        $chart_categories['percentages'][] = $pct;
         $chart_categories['levels'][] = $r['tingkat'];
+        $chart_categories['points'][] = (int)$r['poin'];
+        $chart_categories['items'][] = [
+            'id' => (int)$r['id'],
+            'nama' => $r['nama_pelanggaran'],
+            'tingkat' => $r['tingkat'],
+            'poin' => (int)$r['poin'],
+            'count' => $count,
+            'percentage' => $pct
+        ];
     }
 
-    // 4. Monthly Trend (Line Chart Data - Last 6 Months)
+    // 4. Monthly Trend (Line Chart Data - Chronological with Indonesian Labels)
     $stmtTrend = $pdo->query("
         SELECT DATE_FORMAT(tanggal_kejadian, '%Y-%m') as ym, 
-               DATE_FORMAT(tanggal_kejadian, '%b %Y') as month_label,
                COUNT(id) as count
         FROM violation_records
-        GROUP BY ym
+        GROUP BY DATE_FORMAT(tanggal_kejadian, '%Y-%m')
         ORDER BY ym ASC
-        LIMIT 6
+        LIMIT 12
     ");
     $chart_trend = [
         'labels' => [],
-        'data' => []
+        'data' => [],
+        'diffs' => [],
+        'raw_ym' => []
+    ];
+    $prev_count = null;
+    $indo_months = [
+        '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+        '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu',
+        '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'
     ];
     while ($r = $stmtTrend->fetch()) {
-        $chart_trend['labels'][] = $r['month_label'];
-        $chart_trend['data'][] = (int)$r['count'];
+        $ym = $r['ym'];
+        $parts = explode('-', $ym);
+        $month_num = $parts[1] ?? '01';
+        $year = $parts[0] ?? date('Y');
+        $label = ($indo_months[$month_num] ?? $month_num) . ' ' . $year;
+        
+        $current_count = (int)$r['count'];
+        $diff = ($prev_count !== null) ? ($current_count - $prev_count) : 0;
+        $prev_count = $current_count;
+
+        $chart_trend['labels'][] = $label;
+        $chart_trend['data'][] = $current_count;
+        $chart_trend['diffs'][] = $diff;
+        $chart_trend['raw_ym'][] = $ym;
     }
 
     // 5. Top 5 Students with Highest Points

@@ -17,9 +17,9 @@ $breadcrumbs = $breadcrumbs ?? [['title' => 'Dashboard', 'url' => '#']];
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
-  <title><?= e($page_title) ?> — <?= e(APP_NAME) ?> | <?= e(SCHOOL_NAME) ?></title>
+  <title><?= e($page_title) ?> — <?= e(APP_NAME) ?></title>
   
-  <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/images/logo-kartika.svg">
+  <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/images/logo.svg">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/components.css">
   
@@ -36,12 +36,12 @@ $breadcrumbs = $breadcrumbs ?? [['title' => 'Dashboard', 'url' => '#']];
       <div class="topbar-left">
         <button type="button" class="sidebar-toggle-btn" id="sidebar-toggle" aria-label="Buka Menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="6" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
 
         <nav class="breadcrumb-area" aria-label="Breadcrumb">
-          <a href="<?= BASE_URL ?>" class="breadcrumb-item"><?= e(SCHOOL_NAME) ?></a>
+          <a href="<?= BASE_URL ?>" class="breadcrumb-item"><?= e(APP_NAME) ?></a>
           <?php foreach ($breadcrumbs as $b): ?>
             <span class="breadcrumb-separator">/</span>
             <?php if (!empty($b['url']) && $b['url'] !== '#'): ?>

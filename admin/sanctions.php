@@ -90,7 +90,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="page-header">
   <div>
     <h1 class="page-title">Ketentuan Tingkat Sanksi & Ambang Batas Poin</h1>
-    <p class="page-subtitle">Pedoman formal batas akumulasi poin denda dan intervensi edukatif SMA Kartika 1-2 Medan</p>
+    <p class="page-subtitle">Pedoman formal batas akumulasi poin denda dan intervensi edukatif tata tertib siswa</p>
   </div>
   <div class="page-actions">
     <button type="button" class="btn btn-primary" onclick="openAddModal()">

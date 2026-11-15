@@ -398,3 +398,116 @@
     margin-bottom: 20px;
   }
 }
+
+/* Category Breakdown & Dashboard Refinements */
+.category-breakdown-list {
+  margin-top: 16px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cat-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: #FAFAFA;
+  font-size: 12px;
+}
+
+.cat-summary-row:hover {
+  background: #F1F5F9;
+}
+
+.cat-summary-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cat-name {
+  font-weight: 500;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-summary-metrics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+}
+
+.cat-points {
+  color: var(--color-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.cat-count {
+  color: var(--color-primary);
+}
+
+.cat-pct {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.empty-state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.empty-state-box svg {
+  color: var(--color-secondary);
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+
+.empty-state-box p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.trend-mom-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.trend-mom-pill.up {
+  background-color: rgba(198, 107, 107, 0.12);
+  color: #942E2E;
+}
+
+.trend-mom-pill.down {
+  background-color: rgba(57, 124, 120, 0.12);
+  color: #234E52;
+}
+
+.trend-mom-pill.neutral {
+  background-color: #F1F5F9;
+  color: var(--color-secondary);
+}

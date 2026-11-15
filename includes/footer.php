@@ -11,7 +11,7 @@
         &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA. All Rights Reserved.
       </div>
       <div class="footer-meta-text">
-        <span><?= e(SCHOOL_NAME) ?></span>
+        <span><?= e(APP_NAME) ?></span>
         <span class="footer-dot">&bull;</span>
         <span>Tahun Ajaran <?= e(get_setting('academic_year', '2026/2027')) ?></span>
       </div>

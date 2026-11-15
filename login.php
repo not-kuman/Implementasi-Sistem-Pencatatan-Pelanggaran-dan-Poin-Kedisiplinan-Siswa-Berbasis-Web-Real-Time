@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Masuk Sistem &bull; <?= e(SCHOOL_NAME) ?></title>
   
-  <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/images/logo-kartika.svg">
+  <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/images/logo.svg">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/auth.css">
 </head>
@@ -94,10 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="auth-form-side">
     <div>
       <div class="auth-brand">
-        <img src="<?= BASE_URL ?>/assets/images/logo-kartika.svg" alt="Logo SMA Kartika 1-2 Medan" class="auth-brand-logo">
+        <img src="<?= BASE_URL ?>/assets/images/logo.svg" alt="Logo Sistem Informasi Kedisiplinan Siswa" class="auth-brand-logo">
         <div class="auth-brand-info">
-          <span class="auth-brand-school"><?= e(SCHOOL_NAME) ?></span>
-          <span class="auth-brand-system">Sistem Informasi Kedisiplinan Siswa</span>
+          <span class="auth-brand-school"><?= e(APP_NAME) ?></span>
+          <span class="auth-brand-system"><?= e(APP_SUBTITLE) ?></span>
         </div>
       </div>
 
@@ -170,26 +170,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 
-  <!-- Right Side: Integrasi Peta Digital & Identitas Institusi Sesuai Makalah -->
+  <!-- Right Side: Informasi Fungsional Sistem & Kredibilitas Administratif -->
   <div class="auth-info-side">
-    <div class="school-info-card">
-      <h2 class="info-title"><?= e(SCHOOL_NAME) ?></h2>
-      <p class="info-address">
-        <?= e(get_setting('school_address', 'Jl. Brigjend Katamso No. 235, Medan Maimun, Kota Medan, Sumatera Utara')) ?><br>
-        Telepon: <?= e(get_setting('school_phone', '(061) 7864321')) ?><br>
-        Email: <?= e(get_setting('school_email', 'info@kartika12medan.sch.id')) ?>
+    <div class="system-info-panel">
+      <div class="info-kicker">PORTAL ADMINISTRASI RESMI</div>
+      <h2 class="info-title"><?= e(APP_NAME) ?></h2>
+      <p class="info-description">
+        Sistem manajemen dan pembinaan tata tertib terpusat untuk memantau rekam jejak kedisiplinan serta akumulasi poin pelanggaran peserta didik secara transparan dan akuntabel.
       </p>
 
-      <!-- Digital Map Integration Container -->
-      <div class="map-container-box">
-        <!-- OpenStreetMap embed centered at SMA Kartika 1-2 Medan coordinates -->
-        <iframe 
-          title="Peta Lokasi SMA Kartika 1-2 Medan"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=98.6750%2C3.5550%2C98.6990%2C3.5750&amp;layer=mapnik&amp;marker=3.5658%2C98.6872"
-          loading="lazy">
-        </iframe>
-        <div class="map-badge-coords">
-          GPS: 3.5658° N, 98.6872° E
+      <div class="info-feature-list">
+        <div class="info-feature-item">
+          <div class="feature-bullet"></div>
+          <div>
+            <strong>Pencatatan Insiden Terintegrasi</strong>
+            <span>Pencatatan pelanggaran real-time dengan validasi data dan kalkulasi poin terverifikasi.</span>
+          </div>
+        </div>
+
+        <div class="info-feature-item">
+          <div class="feature-bullet"></div>
+          <div>
+            <strong>Klasifikasi & Sanksi Bertingkat</strong>
+            <span>Hierarki kategori administratif (Ringan, Sedang, Berat) sesuai regulasi sekolah.</span>
+          </div>
+        </div>
+
+        <div class="info-feature-item">
+          <div class="feature-bullet"></div>
+          <div>
+            <strong>Komunikasi Terpadu ke Wali Siswa</strong>
+            <span>Transmisi ringkasan informasi kedisiplinan guna sinergi pembinaan orang tua dan sekolah.</span>
+          </div>
         </div>
       </div>
     </div>
@@ -198,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <svg class="info-security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
-      <span>Pencatatan real-time, transaksi atomik, dan notifikasi WhatsApp terintegrasi.</span>
+      <span>Akses terbatas untuk Administrator, Guru / Tim BK, dan Wali Siswa terdaftar.</span>
     </div>
   </div>
 </div>

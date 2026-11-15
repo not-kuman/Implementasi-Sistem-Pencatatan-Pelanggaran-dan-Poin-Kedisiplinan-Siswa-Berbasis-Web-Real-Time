@@ -38,7 +38,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="page-header">
   <div>
     <h1 class="page-title">Profil Siswa & Panduan Tata Tertib</h1>
-    <p class="page-subtitle">Pedoman pembinaan karakter dan ketentuan poin pelanggaran siswa SMA Kartika 1-2 Medan</p>
+    <p class="page-subtitle">Pedoman pembinaan karakter dan ketentuan poin pelanggaran siswa &bull; <?= e(APP_NAME) ?></p>
   </div>
 </div>
 
@@ -103,7 +103,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
     <div class="card-body-styled">
       <p style="font-size: 12.5px; color: var(--color-text-muted); margin-bottom: 16px; line-height: 1.5;">
-        SMA Kartika 1-2 Medan menerapkan sistem poin kedisiplinan kumulatif berlandaskan tata tertib sekolah. Setiap pelanggaran memiliki bobot poin tertentu, dan akumulasi poin akan menentukan tindak lanjut pembinaan bersama orang tua:
+        Sistem ini menerapkan poin kedisiplinan kumulatif berlandaskan regulasi tata tertib sekolah. Setiap pelanggaran memiliki bobot poin terukur, dan akumulasi poin menentukan tindak lanjut pembinaan bersama orang tua / wali siswa:
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 12px;">
