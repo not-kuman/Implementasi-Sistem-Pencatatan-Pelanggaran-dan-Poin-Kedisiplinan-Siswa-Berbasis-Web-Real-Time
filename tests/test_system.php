@@ -16,7 +16,7 @@ if (file_exists(__DIR__ . '/config/database.php')) {
 }
 
 echo "=======================================================\n";
-echo "   SISTEM INFORMASI KEDISIPLINAN SISWA SMA KARTIKA 1-2 \n";
+echo "       SISTEM INFORMASI KEDISIPLINAN SISWA             \n";
 echo "           END-TO-END VERIFICATION TEST SUITE          \n";
 echo "=======================================================\n\n";
 
@@ -34,6 +34,9 @@ echo "  -> HASIL TEST 1: LULUS (10/10 Tabel Siap & Berisi Data Seed)\n\n";
 // TEST 2: Multi-Role Credentials & Password Verify
 echo "[TEST 2] Verifikasi Otentikasi Password Hashing Multi-Role:\n";
 $test_users = [
+    ['arsyad', 'arsyad123', 'admin'],
+    ['bagas', 'guru123', 'teacher'],
+    ['niken', 'wali123', 'parent'],
     ['admin', 'admin123', 'admin'],
     ['guru1', 'guru123', 'teacher'],
     ['guru2', 'guru123', 'teacher'],

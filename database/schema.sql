@@ -1,6 +1,6 @@
 -- ==============================================================
 -- SISTEM INFORMASI PENCATATAN PELANGGARAN DAN POIN KEDISIPLINAN SISWA
--- SMA KARTIKA 1-2 MEDAN
+-- PENCATATAN PELANGGARAN DAN POIN KEDISIPLINAN
 -- DATABASE SCHEMA
 -- ==============================================================
 
