@@ -20,22 +20,15 @@ foreach ($tables as $tbl) {
 
 echo "Tables truncated.\n";
 
-// 1. Seed Users (Including 3 Group Member Demo Accounts)
+// 1. Seed Users (Tiga Akun Utama Anggota Kelompok Sesuai Ketentuan Tugas)
 // arsyad123: $2y$10$SiwEirBUCC36cYgZHC1GJee9wbW4wbxCXkHzdtclhcNW9UBd87rMa
 // guru123:   $2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO
 // wali123:   $2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6
-// admin123:  $2y$10$wViiujmffm9w2sTN0VYckuDy4c2kECQ9AmlBcNh9Za9wq4TT/OBLW
 $stmtU = $pdo->prepare("INSERT INTO users (id, username, password, full_name, role, status) VALUES (?, ?, ?, ?, ?, ?)");
 $users = [
     [1, 'arsyad', '$2y$10$SiwEirBUCC36cYgZHC1GJee9wbW4wbxCXkHzdtclhcNW9UBd87rMa', 'ARSYAD SADEWA', 'admin', 'active'],
     [2, 'bagas', '$2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO', 'BAGAS PRASETYO', 'teacher', 'active'],
     [3, 'niken', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'NIKEN AYU RESDIANA', 'parent', 'active'],
-    [4, 'admin', '$2y$10$wViiujmffm9w2sTN0VYckuDy4c2kECQ9AmlBcNh9Za9wq4TT/OBLW', 'ARSYAD SADEWA', 'admin', 'active'],
-    [5, 'guru1', '$2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO', 'BAGAS PRASETYO', 'teacher', 'active'],
-    [6, 'guru2', '$2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO', 'Siti Aminah, S.Pd', 'teacher', 'active'],
-    [7, 'wali_farhan', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'NIKEN AYU RESDIANA', 'parent', 'active'],
-    [8, 'wali_dimas', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'Bpk. Agus Setiawan', 'parent', 'active'],
-    [9, 'wali_amanda', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'Ibu Ratna Dewi', 'parent', 'active'],
 ];
 foreach ($users as $u) {
     $stmtU->execute($u);
@@ -46,10 +39,10 @@ echo "Users seeded: " . count($users) . "\n";
 $stmtT = $pdo->prepare("INSERT INTO teachers (id, user_id, nip, nama_guru, jenis_kelamin, jabatan, no_telp, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 $teachers = [
     [1, 2, '198804152012011003', 'BAGAS PRASETYO', 'L', 'Koordinator Bimbingan Konseling & Kedisiplinan', '081260112233', 'bagas.prasetyo@kedisiplinan.sch.id'],
-    [2, 6, '198503142008012003', 'Siti Aminah, S.Pd', 'P', 'Guru Bimbingan Konseling', '081375223344', 'siti.aminah@kedisiplinan.sch.id'],
+    [2, NULL, '198503142008012003', 'Siti Aminah, S.Pd', 'P', 'Guru Bimbingan Konseling', '081375223344', 'siti.aminah@kedisiplinan.sch.id'],
     [3, NULL, '199008222014021001', 'Rizky Pratama, S.Pd', 'L', 'Staf Kesiswaan & Kedisiplinan', '082168334455', 'rizky.pratama@kedisiplinan.sch.id'],
     [4, NULL, '198811102010012005', 'Dewi Lestari, M.Si', 'P', 'Guru Matematika (Wali Kelas)', '085270445566', 'dewi.lestari@kedisiplinan.sch.id'],
-    [5, 5, '198005122005011002', 'Drs. Hendra Gunawan, M.Pd', 'L', 'Guru Senior Pembina Karakter', '081260889900', 'hendra.gunawan@kedisiplinan.sch.id']
+    [5, NULL, '198005122005011002', 'Drs. Hendra Gunawan, M.Pd', 'L', 'Guru Senior Pembina Karakter', '081260889900', 'hendra.gunawan@kedisiplinan.sch.id']
 ];
 foreach ($teachers as $t) {
     $stmtT->execute($t);
@@ -95,9 +88,9 @@ echo "Students seeded: " . count($students) . "\n";
 $stmtP = $pdo->prepare("INSERT INTO parents (id, user_id, student_id, nama_wali, hubungan, pekerjaan, no_telp, alamat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 $parents = [
     [1, 3, 1, 'NIKEN AYU RESDIANA', 'Wali', 'Wiraswasta', '081298760001', 'Jl. Melati No. 14'],
-    [2, 7, 1, 'NIKEN AYU RESDIANA', 'Ibu', 'Wiraswasta', '081298760001', 'Jl. Melati No. 14'],
-    [3, 8, 3, 'Bpk. Agus Setiawan', 'Ayah', 'PNS', '081298760003', 'Jl. STM No. 5'],
-    [4, 9, 2, 'Ibu Ratna Dewi', 'Ibu', 'Pegawai Swasta', '081298760002', 'Jl. Sakti No. 88'],
+    [2, NULL, 1, 'NIKEN AYU RESDIANA', 'Ibu', 'Wiraswasta', '081298760001', 'Jl. Melati No. 14'],
+    [3, NULL, 3, 'Bpk. Agus Setiawan', 'Ayah', 'PNS', '081298760003', 'Jl. STM No. 5'],
+    [4, NULL, 2, 'Ibu Ratna Dewi', 'Ibu', 'Pegawai Swasta', '081298760002', 'Jl. Sakti No. 88'],
     [5, NULL, 5, 'Bpk. Budi Santoso', 'Ayah', 'Wiraswasta', '081298760005', 'Jl. Halat No. 45'],
 ];
 foreach ($parents as $p) {

@@ -98,44 +98,36 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
   </div>
 
-  <!-- Disciplinary Meter / Gauge -->
+  <!-- Status & Panduan Pembinaan Tata Tertib -->
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
       <h2 class="card-title-styled">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Status Akumulasi Poin Kedisiplinan
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Status Tata Tertib &amp; Pembinaan
       </h2>
     </div>
     <div class="card-body-styled">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
         <div>
-          <span style="font-size: 12px; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700;">Total Poin Denda:</span>
-          <div style="font-size: 32px; font-weight: 800; line-height: 1.1; margin-top: 4px; color: <?= $points >= 50 ? 'var(--color-danger)' : ($points >= 20 ? 'var(--color-warning)' : 'var(--color-success)') ?>;">
-            <?= $points ?> <span style="font-size: 14px; font-weight: 600; color: var(--color-text-muted);">/ 100 Poin Max</span>
+          <span style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Akumulasi Poin Terdata:</span>
+          <div style="font-size: 26px; font-weight: 700; line-height: 1.2; margin-top: 2px; color: <?= $points >= 50 ? 'var(--color-danger)' : ($points >= 20 ? 'var(--color-warning)' : 'var(--color-primary)') ?>;">
+            <?= $points ?> <span style="font-size: 13px; font-weight: 500; color: var(--color-text-muted);">/ Batas Maksimal 100 Poin</span>
           </div>
         </div>
-        <div style="text-align: right;">
-          <span class="badge" style="background-color: <?= $points >= 50 ? '#FEE2E2' : ($points >= 20 ? '#FEF3C7' : '#EBF6F0') ?>; color: <?= $points >= 50 ? '#991B1B' : ($points >= 20 ? '#92400E' : '#166534') ?>; font-size: 12px; font-weight: 700; padding: 4px 10px;">
+        <div>
+          <span class="badge" style="background-color: <?= $points >= 50 ? '#FEE2E2' : ($points >= 20 ? '#FEF3C7' : '#EBF6F0') ?>; color: <?= $points >= 50 ? '#991B1B' : ($points >= 20 ? '#92400E' : '#166534') ?>; font-size: 12px; font-weight: 600; padding: 4px 10px;">
             <?= e($sanction['nama_sanksi']) ?>
           </span>
         </div>
       </div>
 
-      <!-- Meter Visual Bar -->
-      <div class="meter-track">
-        <div class="meter-fill <?= $meter_color ?>" style="width: <?= $pct ?>%;"></div>
-      </div>
-      <div class="meter-thresholds">
-        <span>0 (Aman)</span>
-        <span>15 (Peringatan Lisan)</span>
-        <span>30 (SP 1)</span>
-        <span>50 (SP 2)</span>
-        <span>75 (SP 3)</span>
-        <span>100 (Drop Out)</span>
+      <div style="background-color: #F8FAFC; border: 1px solid var(--color-border); padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 10px;">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 4px;">Tindakan Bimbingan Sekolah:</div>
+        <div style="font-size: 12.5px; color: var(--color-text-main); line-height: 1.5;"><?= e($sanction['tindakan']) ?></div>
       </div>
 
-      <div style="margin-top: 14px; font-size: 12px; color: var(--color-text-main); background: #F8FAFC; border: 1px solid var(--color-border); padding: 10px 14px; border-radius: var(--radius-sm);">
-        <strong>Tindakan Pembinaan:</strong> <?= e($sanction['tindakan']) ?>
+      <div style="font-size: 11.5px; color: var(--color-text-muted); line-height: 1.5;">
+        <em>Pencatatan poin kedisiplinan ditujukan untuk pembinaan karakter terpadu antara pihak sekolah dan orang tua/wali siswa.</em>
       </div>
     </div>
   </div>

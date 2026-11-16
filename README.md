@@ -68,7 +68,7 @@ Berikut adalah akun pengguna yang terdaftar di basis data untuk kebutuhan demons
 | **NIKEN AYU RESDIANA** | `niken` | `wali123` | Wali Siswa | Pantau poin anak (M. Farhan Pratama), status sanksi, riwayat pelanggaran (*read-only*) |
 
 > **Catatan Kredensial:**  
-> Kredensial login di atas disimpan menggunakan algoritma *password hashing* BCRYPT yang aman dan semata-mata ditujukan untuk keperluan demonstrasi lokal. Akun alias pendukung seperti `admin` (password: `admin123`), `guru1` (password: `guru123`), dan `wali_farhan` (password: `wali123`) juga aktif dan dapat digunakan.
+> Kredensial login di atas disimpan menggunakan algoritma *password hashing* BCRYPT yang aman dan semata-mata ditujukan untuk keperluan demonstrasi lokal. Hanya tiga akun resmi kelompok di atas yang terdaftar aktif dalam basis data sistem.
 
 ---
 

@@ -128,7 +128,7 @@ require_once __DIR__ . '/../includes/header.php';
       <table class="app-table">
         <thead>
           <tr>
-            <th>Kode TRX / Waktu</th>
+            <th>Tanggal Kejadian</th>
             <th>Peserta Didik</th>
             <th>Bentuk Pelanggaran</th>
             <th>Tingkat</th>
@@ -154,8 +154,8 @@ require_once __DIR__ . '/../includes/header.php';
             ?>
               <tr>
                 <td>
-                  <span style="font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); font-size: 11.5px;"><?= e($r['kode_transaksi']) ?></span>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= format_date_id($r['tanggal_kejadian']) ?> &bull; <?= substr($r['waktu_kejadian'], 0, 5) ?> WIB</div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-primary);"><?= format_date_id($r['tanggal_kejadian']) ?></div>
+                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= substr($r['waktu_kejadian'], 0, 5) ?> WIB</div>
                 </td>
                 <td>
                   <div style="font-weight: 600; color: var(--color-primary);"><?= e($r['nama_siswa']) ?></div>
@@ -237,9 +237,8 @@ async function showDetail(recordId) {
     const r = res.data;
     body.innerHTML = `
       <div style="margin-bottom: 14px;">
-        <span style="font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--color-accent);">${r.kode_transaksi}</span>
-        <div style="font-size: 16px; font-weight: 700; color: var(--color-primary); margin-top: 2px;">${r.nama_siswa} (${r.nama_kelas})</div>
-        <div style="font-size: 12px; color: var(--color-text-muted);">Tanggal: ${r.tanggal_kejadian_formatted} &bull; Tempat: ${r.tempat_kejadian}</div>
+        <div style="font-size: 16px; font-weight: 700; color: var(--color-primary);">${r.nama_siswa} (${r.nama_kelas})</div>
+        <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 2px;">Tanggal: ${r.tanggal_kejadian_formatted} &bull; Tempat: ${r.tempat_kejadian}</div>
       </div>
       <div style="background: #FFFDF9; border: 1px solid #FED7AA; padding: 12px; border-radius: var(--radius-sm); font-size: 12.5px; margin-bottom: 14px;">
         <div style="font-weight: 700; color: #92400E; margin-bottom: 4px;">${r.nama_pelanggaran} (+${r.poin} Poin)</div>

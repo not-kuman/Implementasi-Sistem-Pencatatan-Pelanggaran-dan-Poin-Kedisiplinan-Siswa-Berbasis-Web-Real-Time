@@ -31,17 +31,12 @@ foreach ($tables as $tbl) {
 }
 echo "  -> HASIL TEST 1: LULUS (10/10 Tabel Siap & Berisi Data Seed)\n\n";
 
-// TEST 2: Multi-Role Credentials & Password Verify
-echo "[TEST 2] Verifikasi Otentikasi Password Hashing Multi-Role:\n";
+// TEST 2: Multi-Role Credentials & Password Verify (3 Akun Demo Anggota Kelompok)
+echo "[TEST 2] Verifikasi Otentikasi Password Hashing Multi-Role (3 Akun Anggota Kelompok):\n";
 $test_users = [
     ['arsyad', 'arsyad123', 'admin'],
     ['bagas', 'guru123', 'teacher'],
-    ['niken', 'wali123', 'parent'],
-    ['admin', 'admin123', 'admin'],
-    ['guru1', 'guru123', 'teacher'],
-    ['guru2', 'guru123', 'teacher'],
-    ['wali_farhan', 'wali123', 'parent'],
-    ['wali_dimas', 'wali123', 'parent']
+    ['niken', 'wali123', 'parent']
 ];
 foreach ($test_users as $tu) {
     $stmt = $pdo->prepare("SELECT id, password, role FROM users WHERE username = ?");
@@ -52,6 +47,12 @@ foreach ($test_users as $tu) {
     } else {
         echo "  ❌ Otentikasi akun '{$tu[0]}': GAGAL!\n";
     }
+}
+$user_count = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+if ((int)$user_count === 3) {
+    echo "  ✔ Basis data bersih: Tepat 3 akun pengguna terdaftar (arsyad, bagas, niken).\n";
+} else {
+    echo "  ⚠ Perhatian: Terdapat {$user_count} akun dalam basis data.\n";
 }
 echo "  -> HASIL TEST 2: LULUS (Semua Akun Multi-Role Valid)\n\n";
 

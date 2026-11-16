@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/header.php';
                             data-tingkat="<?= e($cat['tingkat']) ?>" 
                             data-poin="<?= (int)$cat['poin'] ?>" 
                             data-nama="<?= e($cat['nama_pelanggaran']) ?>">
-                      [<?= e($cat['kode']) ?>] <?= e($cat['nama_pelanggaran']) ?> (+<?= (int)$cat['poin'] ?> Poin)
+                      <?= e($cat['nama_pelanggaran']) ?> &bull; Tingkat <?= e($cat['tingkat']) ?> (+<?= (int)$cat['poin'] ?> Poin)
                     </option>
                   <?php endforeach; ?>
                 </optgroup>
@@ -247,9 +247,8 @@ Terima kasih.
     </div>
     <div class="modal-body">
       <div style="text-align: center; margin-bottom: 18px;">
-        <div style="font-family: var(--font-mono); font-weight: 700; color: var(--color-accent); font-size: 15px;" id="succ-trx-code">TRX-202611-XXXX</div>
-        <div style="font-size: 16px; font-weight: 700; color: var(--color-primary); margin-top: 4px;" id="succ-student-name">Nama Siswa</div>
-        <div style="font-size: 12.5px; color: var(--color-text-muted);" id="succ-violation-details">Pelanggaran (+X Poin)</div>
+        <div style="font-size: 17px; font-weight: 700; color: var(--color-primary);" id="succ-student-name">Nama Siswa</div>
+        <div style="font-size: 13px; color: var(--color-text-muted); margin-top: 3px;" id="succ-violation-details">Pelanggaran (+X Poin)</div>
       </div>
 
       <div style="background-color: #F8FAFC; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 16px;">
@@ -492,7 +491,6 @@ document.getElementById('violation-form').addEventListener('submit', async funct
       Toast.success('Berhasil', res.message);
 
       // Populate Success Modal
-      document.getElementById('succ-trx-code').textContent = res.kode_transaksi;
       document.getElementById('succ-student-name').textContent = res.student_name;
       document.getElementById('succ-violation-details').textContent = `${res.category_name} (+${res.points_added} Poin)`;
       document.getElementById('succ-new-total').textContent = res.new_total_points + ' Poin';

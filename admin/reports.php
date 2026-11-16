@@ -51,10 +51,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Disposition: attachment; filename=Rekap_Pelanggaran_Kedisiplinan_' . date('Ymd_His') . '.csv');
     $out = fopen('php://output', 'w');
     fputs($out, "\xEF\xBB\xBF");
-    fputcsv($out, ['No', 'Kode TRX', 'Tanggal', 'Waktu', 'NIS', 'Nama Siswa', 'Kelas', 'Jenis Pelanggaran', 'Tingkat', 'Poin', 'Tempat Kejadian', 'Keterangan', 'Guru Pencatat', 'Status Tindak Lanjut']);
+    fputcsv($out, ['No', 'Tanggal', 'Waktu', 'NIS', 'Nama Siswa', 'Kelas', 'Jenis Pelanggaran', 'Tingkat', 'Poin', 'Tempat Kejadian', 'Keterangan', 'Guru Pencatat', 'Status Tindak Lanjut']);
 
     $sqlCsv = "
-        SELECT vr.kode_transaksi, vr.tanggal_kejadian, vr.waktu_kejadian, s.nis, s.nama_lengkap, c.nama_kelas,
+        SELECT vr.tanggal_kejadian, vr.waktu_kejadian, s.nis, s.nama_lengkap, c.nama_kelas,
                vc.nama_pelanggaran, vc.tingkat, vr.poin, vr.tempat_kejadian, vr.keterangan, t.nama_guru, vr.status_tindak_lanjut
         FROM violation_records vr
         JOIN students s ON vr.student_id = s.id
@@ -70,7 +70,6 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     while ($r = $stmtC->fetch()) {
         fputcsv($out, [
             $no++,
-            $r['kode_transaksi'],
             $r['tanggal_kejadian'],
             $r['waktu_kejadian'],
             $r['nis'],
@@ -221,7 +220,6 @@ require_once __DIR__ . '/../includes/header.php';
       <tr style="background: #F1F5F9;">
         <th style="width: 35px; text-align: center;">No</th>
         <th>Tanggal</th>
-        <th>Kode TRX</th>
         <th>NIS</th>
         <th>Nama Siswa</th>
         <th>Kelas</th>
@@ -234,7 +232,7 @@ require_once __DIR__ . '/../includes/header.php';
     <tbody>
       <?php if (empty($records)): ?>
         <tr>
-          <td colspan="10" style="text-align: center; padding: 30px; color: #64748B;">
+          <td colspan="9" style="text-align: center; padding: 30px; color: #64748B;">
             Tidak ada catatan pelanggaran yang terdata pada parameter periode ini.
           </td>
         </tr>
@@ -243,7 +241,6 @@ require_once __DIR__ . '/../includes/header.php';
           <tr>
             <td style="text-align: center; font-weight: 600;"><?= $no++ ?></td>
             <td><?= format_date_id($r['tanggal_kejadian']) ?></td>
-            <td style="font-family: var(--font-mono); font-size: 11px;"><?= e($r['kode_transaksi']) ?></td>
             <td style="font-family: var(--font-mono); font-size: 11px;"><?= e($r['nis']) ?></td>
             <td style="font-weight: 600; color: #172B3A;"><?= e($r['nama_siswa']) ?></td>
             <td><?= e($r['nama_kelas']) ?></td>

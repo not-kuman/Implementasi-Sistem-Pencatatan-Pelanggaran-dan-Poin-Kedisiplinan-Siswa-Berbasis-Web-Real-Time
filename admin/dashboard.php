@@ -94,8 +94,8 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">Pusat Komando Kedisiplinan</h1>
-    <p class="page-subtitle"><?= e(APP_SUBTITLE) ?> &mdash; Pemantauan tata tertib terpusat</p>
+    <h1 class="page-title">Ringkasan Sistem Kedisiplinan</h1>
+    <p class="page-subtitle"><?= e(SCHOOL_NAME) ?> &mdash; Pemantauan tata tertib dan rekam jejak kedisiplinan siswa</p>
   </div>
   <div class="page-actions">
     <button type="button" class="btn btn-secondary" id="btn-refresh-stats">
@@ -113,61 +113,32 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- 5 Stat Metrics Cards -->
-<div class="grid-metrics">
-  <div class="metric-card">
-    <div class="metric-header">
-      <span class="metric-label">Total Siswa Aktif</span>
-      <div class="metric-icon-wrap primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      </div>
-    </div>
-    <div class="metric-value" id="stat-students"><?= number_format($total_students) ?></div>
-    <div class="metric-trend">Peserta didik terdaftar aktif</div>
+<!-- Administrative Summary Bar (Cohesive Editorial Design) -->
+<div class="admin-summary-bar">
+  <div class="summary-segment">
+    <span class="summary-label">Siswa Aktif</span>
+    <div class="summary-value" id="stat-students"><?= number_format($total_students) ?></div>
+    <div class="summary-subtext">Peserta didik terdaftar</div>
   </div>
-
-  <div class="metric-card">
-    <div class="metric-header">
-      <span class="metric-label">Tenaga Pendidik / BK</span>
-      <div class="metric-icon-wrap accent">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      </div>
-    </div>
-    <div class="metric-value" id="stat-teachers"><?= number_format($total_teachers) ?></div>
-    <div class="metric-trend">Guru & tim penegak disiplin</div>
+  <div class="summary-segment">
+    <span class="summary-label">Tenaga Pendidik / BK</span>
+    <div class="summary-value" id="stat-teachers"><?= number_format($total_teachers) ?></div>
+    <div class="summary-subtext">Guru &amp; tim penegak disiplin</div>
   </div>
-
-  <div class="metric-card">
-    <div class="metric-header">
-      <span class="metric-label">Rombongan Belajar</span>
-      <div class="metric-icon-wrap warning">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-      </div>
-    </div>
-    <div class="metric-value" id="stat-classes"><?= number_format($total_classes) ?></div>
-    <div class="metric-trend">Tingkat X, XI, dan XII</div>
+  <div class="summary-segment">
+    <span class="summary-label">Rombongan Belajar</span>
+    <div class="summary-value" id="stat-classes"><?= number_format($total_classes) ?></div>
+    <div class="summary-subtext">Kelas X, XI, dan XII</div>
   </div>
-
-  <div class="metric-card">
-    <div class="metric-header">
-      <span class="metric-label">Insiden Pelanggaran</span>
-      <div class="metric-icon-wrap danger">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="9" x2="12" y2="13"/><polygon points="12 2 2 22 22 22 12 2"/></svg>
-      </div>
-    </div>
-    <div class="metric-value" id="stat-records"><?= number_format($total_records) ?></div>
-    <div class="metric-trend">Total transaksi kejadian</div>
+  <div class="summary-segment">
+    <span class="summary-label">Insiden Pelanggaran</span>
+    <div class="summary-value" id="stat-records"><?= number_format($total_records) ?></div>
+    <div class="summary-subtext">Catatan rekam kedisiplinan</div>
   </div>
-
-  <div class="metric-card">
-    <div class="metric-header">
-      <span class="metric-label">Akumulasi Poin Denda</span>
-      <div class="metric-icon-wrap primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      </div>
-    </div>
-    <div class="metric-value" id="stat-points" style="color: var(--color-danger);"><?= number_format($total_points) ?></div>
-    <div class="metric-trend">Poin kedisiplinan kumulatif</div>
+  <div class="summary-segment">
+    <span class="summary-label">Akumulasi Poin Denda</span>
+    <div class="summary-value" id="stat-points"><?= number_format($total_points) ?></div>
+    <div class="summary-subtext">Rata-rata: <?= $total_records > 0 ? round($total_points / $total_records, 1) : 0 ?> poin/insiden</div>
   </div>
 </div>
 
@@ -324,11 +295,11 @@ require_once __DIR__ . '/../includes/header.php';
         <table class="app-table">
           <thead>
             <tr>
-              <th>Kode / Waktu</th>
-              <th>Siswa</th>
-              <th>Pelanggaran</th>
+              <th>Tanggal Kejadian</th>
+              <th>Siswa &amp; Kelas</th>
+              <th>Bentuk Pelanggaran</th>
               <th style="text-align: center;">Poin</th>
-              <th>Guru Pelapor</th>
+              <th>Guru Pencatat</th>
             </tr>
           </thead>
           <tbody id="recent-activities-body">
@@ -344,16 +315,16 @@ require_once __DIR__ . '/../includes/header.php';
               ?>
                 <tr>
                   <td>
-                    <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--color-accent);"><?= e($rec['kode_transaksi']) ?></div>
-                    <div style="font-size: 11px; color: var(--color-text-muted);"><?= format_date_id($rec['tanggal_kejadian']) ?></div>
+                    <div style="font-size: 12.5px; font-weight: 600; color: var(--color-primary);"><?= format_date_id($rec['tanggal_kejadian']) ?></div>
+                    <div style="font-size: 11px; color: var(--color-text-muted);"><?= substr($rec['waktu_kejadian'] ?? '', 0, 5) ?> WIB</div>
                   </td>
                   <td>
-                    <div style="font-weight: 600;"><?= e($rec['nama_siswa']) ?></div>
-                    <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($rec['nama_kelas']) ?></div>
+                    <div style="font-weight: 600; color: var(--color-primary);"><?= e($rec['nama_siswa']) ?></div>
+                    <div style="font-size: 11.5px; color: var(--color-text-muted);"><?= e($rec['nama_kelas']) ?></div>
                   </td>
                   <td>
                     <span class="badge <?= $sev_class ?>"><?= e($rec['tingkat']) ?></span>
-                    <div style="font-size: 12px; margin-top: 3px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= e($rec['nama_pelanggaran']) ?>">
+                    <div style="font-size: 12.5px; margin-top: 3px; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= e($rec['nama_pelanggaran']) ?>">
                       <?= e($rec['nama_pelanggaran']) ?>
                     </div>
                   </td>
@@ -361,7 +332,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="badge-points danger">+<?= (int)$rec['poin'] ?></span>
                   </td>
                   <td>
-                    <div style="font-size: 12px; font-weight: 500;"><?= e($rec['nama_guru']) ?></div>
+                    <div style="font-size: 12px; font-weight: 500; color: var(--color-text-main);"><?= e($rec['nama_guru']) ?></div>
                   </td>
                 </tr>
               <?php endforeach; ?>

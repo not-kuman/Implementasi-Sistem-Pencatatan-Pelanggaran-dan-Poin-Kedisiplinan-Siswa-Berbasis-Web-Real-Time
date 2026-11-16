@@ -130,7 +130,7 @@ require_once __DIR__ . '/../includes/header.php';
     <form method="GET" action="<?= BASE_URL ?>/admin/violations.php" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 12px; align-items: flex-end;">
       <div>
         <label class="form-label" style="margin-bottom: 4px;">Pencarian</label>
-        <input type="text" name="search" class="form-control" placeholder="Kode TRX, siswa, jenis..." value="<?= e($search) ?>">
+        <input type="text" name="search" class="form-control" placeholder="Nama siswa, NIS, jenis pelanggaran..." value="<?= e($search) ?>">
       </div>
       <div>
         <label class="form-label" style="margin-bottom: 4px;">Rombel / Kelas</label>
@@ -179,10 +179,9 @@ require_once __DIR__ . '/../includes/header.php';
       <table class="app-table">
         <thead>
           <tr>
-            <th>Kode TRX</th>
-            <th>Waktu Kejadian</th>
+            <th>Tanggal Kejadian</th>
             <th>Peserta Didik</th>
-            <th>Jenis Pelanggaran</th>
+            <th>Bentuk Pelanggaran</th>
             <th>Tingkat</th>
             <th style="text-align: center;">Poin</th>
             <th>Guru Pelapor</th>
@@ -194,7 +193,7 @@ require_once __DIR__ . '/../includes/header.php';
         <tbody>
           <?php if (empty($records)): ?>
             <tr>
-              <td colspan="10">
+              <td colspan="9">
                 <div class="empty-state">
                   <div class="empty-state-title">Tidak ada data pelanggaran</div>
                   <div class="empty-state-text">Sesuaikan parameter filter atau cari kata kunci lain.</div>
@@ -207,10 +206,7 @@ require_once __DIR__ . '/../includes/header.php';
             ?>
               <tr>
                 <td>
-                  <span style="font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); font-size: 11.5px;"><?= e($r['kode_transaksi']) ?></span>
-                </td>
-                <td>
-                  <div style="font-size: 12px; font-weight: 600;"><?= format_date_id($r['tanggal_kejadian']) ?></div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-primary);"><?= format_date_id($r['tanggal_kejadian']) ?></div>
                   <div style="font-size: 11px; color: var(--color-text-muted);"><?= substr($r['waktu_kejadian'], 0, 5) ?> WIB</div>
                 </td>
                 <td>
@@ -229,7 +225,7 @@ require_once __DIR__ . '/../includes/header.php';
                   <span class="badge-points danger" style="font-weight: 700;">+<?= (int)$r['poin'] ?></span>
                 </td>
                 <td>
-                  <span style="font-size: 12px; font-weight: 500;"><?= e($r['nama_guru']) ?></span>
+                  <span style="font-size: 12px; font-weight: 500; color: var(--color-text-main);"><?= e($r['nama_guru']) ?></span>
                 </td>
                 <td>
                   <?php if ($r['wa_status'] === 'sent' || $r['wa_status'] === 'simulated'): ?>
@@ -252,7 +248,7 @@ require_once __DIR__ . '/../includes/header.php';
                   <button type="button" class="btn btn-secondary btn-sm" onclick="viewDetail(<?= (int)$r['id'] ?>)" title="Detail Lengkap & Notifikasi">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteRecord(<?= (int)$r['id'] ?>, '<?= e(addslashes($r['kode_transaksi'])) ?>')" style="color: var(--color-danger);" title="Hapus Catatan & Kurangi Poin Siswa">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteRecord(<?= (int)$r['id'] ?>, '<?= e(addslashes($r['nama_siswa'])) ?>')" style="color: var(--color-danger);" title="Hapus Catatan & Kurangi Poin Siswa">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                   </button>
                 </td>
@@ -348,10 +344,9 @@ async function viewDetail(recordId) {
         </div>
 
         <div style="background-color: #F8FAFC; padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-          <div style="font-size: 11px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">Parameter Transaksi</div>
-          <div style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--color-accent); margin-top: 3px;">${r.kode_transaksi}</div>
-          <div style="font-size: 12px; color: var(--color-text-muted);">Tanggal: ${r.tanggal_kejadian_formatted} &bull; ${r.waktu_kejadian_formatted}</div>
-          <div style="font-size: 12px; color: var(--color-text-muted);">Tempat: ${r.tempat_kejadian}</div>
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">Waktu &amp; Tempat Kejadian</div>
+          <div style="font-size: 14px; font-weight: 700; color: var(--color-primary); margin-top: 3px;">${r.tanggal_kejadian_formatted}</div>
+          <div style="font-size: 12px; color: var(--color-text-muted);">Pukul: ${r.waktu_kejadian_formatted} &bull; ${r.tempat_kejadian}</div>
           <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">Pencatat: <strong>${r.nama_guru}</strong></div>
         </div>
       </div>
@@ -384,7 +379,7 @@ async function sendWhatsAppModal() {
 
   const ok = await confirmAction({
     title: 'Kirim Notifikasi WhatsApp',
-    message: `Kirimkan rincian pelanggaran transaksi ${r.kode_transaksi} ke nomor WhatsApp wali (${r.no_telp_wali})?`,
+    message: `Kirimkan rincian notifikasi pelanggaran untuk ${r.nama_siswa} ke nomor WhatsApp wali (${r.no_telp_wali})?`,
     confirmText: 'Kirim Sekarang'
   });
 
@@ -420,10 +415,10 @@ async function sendWhatsAppModal() {
   }
 }
 
-async function deleteRecord(recordId, trxCode) {
+async function deleteRecord(recordId, studentName) {
   const ok = await confirmAction({
     title: 'Hapus Catatan Pelanggaran',
-    message: `Hapus rekam pelanggaran "${trxCode}"? Poin siswa yang bersangkutan akan dikurangi kembali secara otomatis melalui transaksi basis data.`,
+    message: `Hapus catatan rekam pelanggaran siswa "${studentName}"? Poin siswa yang bersangkutan akan dikurangi kembali secara otomatis melalui transaksi basis data.`,
     confirmText: 'Ya, Hapus & Kurangi Poin',
     isDanger: true
   });

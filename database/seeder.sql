@@ -19,29 +19,23 @@ TRUNCATE TABLE `teachers`;
 TRUNCATE TABLE `users`;
 TRUNCATE TABLE `system_settings`;
 
--- 1. SEED USERS (Akun Demo Anggota Kelompok & Kompatibilitas)
--- Password Default:
--- arsyad / admin: arsyad123 / admin123
--- bagas / guru1: guru123
--- niken / wali_farhan: wali123
+-- 1. SEED USERS (Tiga Akun Utama Anggota Kelompok Sesuai Ketentuan Tugas)
+-- Kredensial Login:
+-- arsyad: arsyad123 (Administrator)
+-- bagas:  guru123   (Guru / BK)
+-- niken:  wali123   (Wali Siswa)
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `role`, `status`) VALUES
 (1, 'arsyad', '$2y$10$SiwEirBUCC36cYgZHC1GJee9wbW4wbxCXkHzdtclhcNW9UBd87rMa', 'ARSYAD SADEWA', 'admin', 'active'),
 (2, 'bagas', '$2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO', 'BAGAS PRASETYO', 'teacher', 'active'),
-(3, 'niken', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'NIKEN AYU RESDIANA', 'parent', 'active'),
-(4, 'admin', '$2y$10$wViiujmffm9w2sTN0VYckuDy4c2kECQ9AmlBcNh9Za9wq4TT/OBLW', 'ARSYAD SADEWA', 'admin', 'active'),
-(5, 'guru1', '$2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO', 'BAGAS PRASETYO', 'teacher', 'active'),
-(6, 'guru2', '$2y$10$qdse/2df4ufpMO7qPqnk0.FQOIAXFrtQBkKyjccaOVT7RBcmboCgO', 'Siti Aminah, S.Pd', 'teacher', 'active'),
-(7, 'wali_farhan', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'NIKEN AYU RESDIANA', 'parent', 'active'),
-(8, 'wali_dimas', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'Bpk. Agus Setiawan', 'parent', 'active'),
-(9, 'wali_amanda', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'Ibu Ratna Dewi', 'parent', 'active');
+(3, 'niken', '$2y$10$JiJJT4636fRzMZx3qel2ce/2IrpWW7C0hKi0h.kVYcEudnzx8WyZ6', 'NIKEN AYU RESDIANA', 'parent', 'active');
 
 -- 2. SEED TEACHERS
 INSERT INTO `teachers` (`id`, `user_id`, `nip`, `nama_guru`, `jenis_kelamin`, `jabatan`, `no_telp`, `email`) VALUES
 (1, 2, '198804152012011003', 'BAGAS PRASETYO', 'L', 'Koordinator Bimbingan Konseling & Kedisiplinan', '081260112233', 'bagas.prasetyo@kedisiplinan.sch.id'),
-(2, 6, '198503142008012003', 'Siti Aminah, S.Pd', 'P', 'Guru Bimbingan Konseling', '081375223344', 'siti.aminah@kedisiplinan.sch.id'),
+(2, NULL, '198503142008012003', 'Siti Aminah, S.Pd', 'P', 'Guru Bimbingan Konseling', '081375223344', 'siti.aminah@kedisiplinan.sch.id'),
 (3, NULL, '199008222014021001', 'Rizky Pratama, S.Pd', 'L', 'Staf Kesiswaan & Kedisiplinan', '082168334455', 'rizky.pratama@kedisiplinan.sch.id'),
 (4, NULL, '198811102010012005', 'Dewi Lestari, M.Si', 'P', 'Guru Matematika (Wali Kelas)', '085270445566', 'dewi.lestari@kedisiplinan.sch.id'),
-(5, 5, '198005122005011002', 'Drs. Hendra Gunawan, M.Pd', 'L', 'Guru Senior Pembina Karakter', '081260889900', 'hendra.gunawan@kedisiplinan.sch.id');
+(5, NULL, '198005122005011002', 'Drs. Hendra Gunawan, M.Pd', 'L', 'Guru Senior Pembina Karakter', '081260889900', 'hendra.gunawan@kedisiplinan.sch.id');
 
 -- 3. SEED CLASSES
 INSERT INTO `classes` (`id`, `nama_kelas`, `tingkat`, `jurusan`, `wali_kelas_id`, `tahun_ajaran`) VALUES
@@ -69,9 +63,9 @@ INSERT INTO `students` (`id`, `nis`, `nisn`, `nama_lengkap`, `jenis_kelamin`, `c
 -- 5. SEED PARENTS (Menghubungkan Niken Ayu Resdiana ke Siswa #1)
 INSERT INTO `parents` (`id`, `user_id`, `student_id`, `nama_wali`, `hubungan`, `pekerjaan`, `no_telp`, `alamat`) VALUES
 (1, 3, 1, 'NIKEN AYU RESDIANA', 'Wali', 'Wiraswasta', '081298760001', 'Jl. Melati No. 14'),
-(2, 7, 1, 'NIKEN AYU RESDIANA', 'Ibu', 'Wiraswasta', '081298760001', 'Jl. Melati No. 14'),
-(3, 8, 3, 'Bpk. Agus Setiawan', 'Ayah', 'PNS', '081298760003', 'Jl. STM No. 5'),
-(4, 9, 2, 'Ibu Ratna Dewi', 'Ibu', 'Pegawai Swasta', '081298760002', 'Jl. Sakti No. 88'),
+(2, NULL, 1, 'NIKEN AYU RESDIANA', 'Ibu', 'Wiraswasta', '081298760001', 'Jl. Melati No. 14'),
+(3, NULL, 3, 'Bpk. Agus Setiawan', 'Ayah', 'PNS', '081298760003', 'Jl. STM No. 5'),
+(4, NULL, 2, 'Ibu Ratna Dewi', 'Ibu', 'Pegawai Swasta', '081298760002', 'Jl. Sakti No. 88'),
 (5, NULL, 5, 'Bpk. Budi Santoso', 'Ayah', 'Wiraswasta', '081298760005', 'Jl. Halat No. 45');
 
 -- 6. SEED VIOLATION_CATEGORIES (24 Kategori Pelanggaran Standar)

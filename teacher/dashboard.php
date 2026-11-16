@@ -134,7 +134,7 @@ require_once __DIR__ . '/../includes/header.php';
       <table class="app-table">
         <thead>
           <tr>
-            <th>Kode TRX / Waktu</th>
+            <th>Tanggal Kejadian</th>
             <th>Nama Siswa</th>
             <th>Kelas</th>
             <th>Bentuk Pelanggaran</th>
@@ -159,8 +159,8 @@ require_once __DIR__ . '/../includes/header.php';
             ?>
               <tr>
                 <td>
-                  <span style="font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); font-size: 11.5px;"><?= e($r['kode_transaksi']) ?></span>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= format_date_id($r['tanggal_kejadian']) ?></div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-primary);"><?= format_date_id($r['tanggal_kejadian']) ?></div>
+                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= substr($r['waktu_kejadian'] ?? '', 0, 5) ?> WIB</div>
                 </td>
                 <td>
                   <div style="font-weight: 600; color: var(--color-primary);"><?= e($r['nama_siswa']) ?></div>
