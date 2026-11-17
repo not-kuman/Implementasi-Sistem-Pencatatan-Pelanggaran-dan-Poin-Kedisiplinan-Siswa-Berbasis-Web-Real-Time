@@ -89,6 +89,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="login-page">
 
+<!-- Subtle Background Architectural Watermark -->
+<div class="login-bg-watermark" aria-hidden="true">
+  <img src="<?= BASE_URL ?>/assets/images/logo.svg" alt="" class="login-watermark-img">
+</div>
+
+<!-- Viewport Framing: Corner Administrative Tags -->
+<div class="login-corner-tag login-corner-tl" aria-hidden="true">
+  <span class="corner-dot"></span>
+  <span>SIM KEDISIPLINAN SISWA</span>
+  <span>&bull;</span>
+  <span>T.A. <?= e(get_setting('academic_year', '2026/2027')) ?></span>
+</div>
+
+<div class="login-corner-tag login-corner-tr" aria-hidden="true">
+  <span class="corner-dot-live"></span>
+  <span>PORTAL SISTEM AKTIF</span>
+</div>
+
+<div class="login-corner-tag login-corner-bl" aria-hidden="true">
+  <span>MODUL TATA TERTIB & POIN KEDISIPLINAN</span>
+</div>
+
+<div class="login-corner-tag login-corner-br" aria-hidden="true">
+  <span>REKAM DATA & PEMBINAAN SISWA</span>
+</div>
+
+<!-- Main Central Wrapper -->
 <div class="login-wrapper">
   <!-- Header Identitas Aplikasi -->
   <header class="login-header">
@@ -104,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="login-card">
     <div class="login-card-header">
       <h2 class="login-card-title">Masuk ke Portal</h2>
-      <span class="login-card-badge">Autentikasi Terpadu</span>
+      <p class="login-card-sub">Masukkan kredensial akun Anda untuk melanjutkan</p>
     </div>
 
     <?php if (!$db_configured): ?>
