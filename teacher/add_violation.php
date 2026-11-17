@@ -33,6 +33,16 @@ foreach ($all_categories as $c) {
 // Fetch active sanctions for preview
 $sanctions = $pdo->query("SELECT * FROM sanctions ORDER BY poin_min ASC")->fetchAll();
 
+// Fetch active students for instant lookup and datalist fallback
+$stmtStudents = $pdo->query("
+    SELECT s.id, s.nis, s.nama_lengkap, s.jenis_kelamin, s.total_poin, s.no_telp_wali, c.nama_kelas
+    FROM students s
+    JOIN classes c ON s.class_id = c.id
+    WHERE s.status_siswa = 'aktif'
+    ORDER BY s.nama_lengkap ASC
+");
+$all_active_students = $stmtStudents->fetchAll();
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -65,7 +75,12 @@ require_once __DIR__ . '/../includes/header.php';
               1. Cari & Pilih Peserta Didik <span class="required">*</span>
             </label>
             <div class="autocomplete-wrapper">
-              <input type="text" id="student-search-input" class="form-control" placeholder="Ketik nama lengkap atau NIS siswa (minimal 2 huruf)...">
+              <input type="text" id="student-search-input" list="student-datalist" class="form-control" placeholder="Ketik nama lengkap atau NIS siswa (minimal 2 huruf)...">
+              <datalist id="student-datalist">
+                <?php foreach ($all_active_students as $st): ?>
+                  <option value="<?= e($st['nama_lengkap']) ?>"><?= e($st['nis']) ?> - <?= e($st['nama_kelas']) ?></option>
+                <?php endforeach; ?>
+              </datalist>
               <div class="autocomplete-dropdown" id="student-dropdown"></div>
             </div>
             <small style="font-size: 11px; color: var(--color-text-muted);">Sistem akan mencari secara seketika dari pangkalan data siswa aktif.</small>
@@ -99,8 +114,8 @@ require_once __DIR__ . '/../includes/header.php';
             <label class="form-label">
               2. Kategori Pelanggaran Tata Tertib <span class="required">*</span>
             </label>
-            <select name="category_id" id="category_select" class="form-control" required disabled>
-              <option value="">-- Pilih Siswa Terlebih Dahulu --</option>
+            <select name="category_id" id="category_select" class="form-control" required>
+              <option value="">-- Pilih Kategori Pelanggaran --</option>
               <?php foreach ($categories_grouped as $group_name => $cats): ?>
                 <optgroup label="Tingkat <?= $group_name ?>">
                   <?php foreach ($cats as $cat): ?>
@@ -284,8 +299,10 @@ Terima kasih.
 </div>
 
 <script>
-// Sanctions matrix client cache
+// Sanctions matrix client cache & students cache
 const SANCTIONS_DATA = <?= json_encode($sanctions) ?>;
+const ALL_STUDENTS = <?= json_encode($all_active_students) ?>;
+const APP_NAME_VAL = <?= json_encode(APP_NAME) ?>;
 
 let selectedStudent = null;
 let lastRecordedResult = null;
@@ -296,10 +313,49 @@ const dropdown = document.getElementById('student-dropdown');
 const categorySelect = document.getElementById('category_select');
 const submitBtn = document.getElementById('btn-submit-violation');
 
+// Auto-resolve student from typed input
+function resolveTypedStudent(queryVal) {
+  const q = (queryVal !== undefined ? queryVal : searchInput.value || '').trim().toLowerCase();
+  if (!q) return false;
+
+  // 1. Exact match by name or NIS
+  let found = ALL_STUDENTS.find(s => s.nama_lengkap.toLowerCase() === q || s.nis.toLowerCase() === q);
+
+  // 2. Partial match if query is at least 3 chars
+  if (!found && q.length >= 3) {
+    const matches = ALL_STUDENTS.filter(s => 
+      s.nama_lengkap.toLowerCase().includes(q) || 
+      s.nis.toLowerCase().includes(q)
+    );
+    if (matches.length === 1) {
+      found = matches[0];
+    } else if (matches.length > 1) {
+      const prefixMatch = matches.find(s => s.nama_lengkap.toLowerCase().startsWith(q));
+      if (prefixMatch) found = prefixMatch;
+    }
+  }
+
+  if (found) {
+    selectStudent(found);
+    return true;
+  }
+  return false;
+}
+
 // 1. Asynchronous Student Search Autocomplete
 searchInput.addEventListener('input', function() {
   clearTimeout(searchTimer);
   const q = this.value.trim();
+
+  // Instant check if typed text matches a student exactly
+  if (q.length >= 3) {
+    const exact = ALL_STUDENTS.find(s => s.nama_lengkap.toLowerCase() === q.toLowerCase() || s.nis.toLowerCase() === q.toLowerCase());
+    if (exact) {
+      selectStudent(exact);
+      return;
+    }
+  }
+
   if (q.length < 2) {
     dropdown.innerHTML = '';
     dropdown.classList.remove('active');
@@ -337,6 +393,27 @@ searchInput.addEventListener('input', function() {
   }, 250);
 });
 
+searchInput.addEventListener('change', function() {
+  if (!selectedStudent) {
+    resolveTypedStudent(this.value);
+  }
+});
+
+searchInput.addEventListener('blur', function() {
+  setTimeout(() => {
+    if (!selectedStudent && searchInput.value.trim().length >= 2) {
+      resolveTypedStudent(searchInput.value);
+    }
+  }, 200);
+});
+
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    resolveTypedStudent(this.value);
+  }
+});
+
 // Close dropdown on click outside
 document.addEventListener('click', function(e) {
   if (!dropdown.contains(e.target) && e.target !== searchInput) {
@@ -359,9 +436,8 @@ function selectStudent(student) {
   document.getElementById('student-selected-box').style.display = 'block';
   dropdown.classList.remove('active');
 
-  // Enable category select & submit button
+  // Category is always enabled
   categorySelect.disabled = false;
-  categorySelect.options[0].textContent = '-- Pilih Kategori Pelanggaran --';
   categorySelect.focus();
 
   updateCalculationsAndPreview();
@@ -376,9 +452,8 @@ function clearSelectedStudent() {
   searchInput.value = '';
   searchInput.focus();
 
-  categorySelect.selectedIndex = 0;
-  categorySelect.disabled = true;
-  categorySelect.options[0].textContent = '-- Pilih Siswa Terlebih Dahulu --';
+  // Keep category select enabled so user can always pick category
+  categorySelect.disabled = false;
   submitBtn.disabled = true;
   document.getElementById('points-indicator-box').style.display = 'none';
 
@@ -446,10 +521,17 @@ Total Akumulasi Poin: ${projectedTotal}
 Mohon perhatian dan kerja sama Bapak/Ibu dalam mendukung pembinaan kedisiplinan siswa.
 
 Terima kasih.
-<?= json_encode(APP_NAME) ?>.replace(/^"|"$/g, '');
+${APP_NAME_VAL}`;
 
     document.getElementById('wa-preview-text').textContent = waText;
 
+  } else if (hasCat && !selectedStudent) {
+    const pts = parseInt(opt.getAttribute('data-poin')) || 0;
+    document.getElementById('points-indicator-box').style.display = 'block';
+    document.getElementById('disp_added_points').textContent = '+' + pts + ' Poin';
+    document.getElementById('disp_projected_total').textContent = 'Pilih siswa';
+    document.getElementById('disp_sanction_title').textContent = 'Tertib (Belum ada sanksi)';
+    document.getElementById('disp_sanction_action').textContent = 'Pilih siswa untuk melihat proyeksi akumulasi poin dan sanksi.';
   } else {
     document.getElementById('points-indicator-box').style.display = 'none';
     document.getElementById('disp_sanction_title').textContent = 'Tertib (Belum ada sanksi)';
@@ -460,6 +542,10 @@ Terima kasih.
 // 5. Form Submission via AJAX with Transaction & Double-Submit Guard
 document.getElementById('violation-form').addEventListener('submit', async function(e) {
   e.preventDefault();
+
+  if (!selectedStudent) {
+    resolveTypedStudent(searchInput.value);
+  }
 
   if (!selectedStudent || !categorySelect.value) {
     Toast.error('Formulir Belum Lengkap', 'Pilih siswa dan kategori pelanggaran terlebih dahulu.');
