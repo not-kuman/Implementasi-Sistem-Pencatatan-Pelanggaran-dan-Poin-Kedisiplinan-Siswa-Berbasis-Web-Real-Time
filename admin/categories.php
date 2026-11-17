@@ -142,42 +142,32 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<div class="surface-card" style="margin-bottom: 20px;">
-  <div class="card-body-styled" style="padding: 16px 20px;">
-    <form method="GET" action="<?= BASE_URL ?>/admin/categories.php" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;">
-      <div style="flex: 1; min-width: 220px;">
-        <label class="form-label" style="margin-bottom: 4px;">Pencarian</label>
-        <input type="text" name="search" class="form-control" placeholder="Cari nama pelanggaran, kode..." value="<?= e($filter_search) ?>">
+<!-- Categories Data Sheet with Integrated Toolbar -->
+<div class="data-sheet">
+  <div class="admin-toolbar">
+    <form method="GET" action="<?= BASE_URL ?>/admin/categories.php" class="admin-toolbar-form">
+      <div class="admin-search-wrap">
+        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama pelanggaran, kode..." value="<?= e($filter_search) ?>">
       </div>
-      <div style="width: 200px;">
-        <label class="form-label" style="margin-bottom: 4px;">Tingkat Pelanggaran</label>
-        <select name="tingkat" class="form-control">
-          <option value="">Semua Tingkat</option>
-          <option value="Ringan" <?= $filter_tingkat === 'Ringan' ? 'selected' : '' ?>>Ringan</option>
-          <option value="Sedang" <?= $filter_tingkat === 'Sedang' ? 'selected' : '' ?>>Sedang</option>
-          <option value="Berat" <?= $filter_tingkat === 'Berat' ? 'selected' : '' ?>>Berat</option>
-        </select>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button type="submit" class="btn btn-primary" style="height: 38px;">Filter</button>
-        <?php if (!empty($filter_search) || !empty($filter_tingkat)): ?>
-          <a href="<?= BASE_URL ?>/admin/categories.php" class="btn btn-secondary" style="height: 38px;">Reset</a>
-        <?php endif; ?>
-      </div>
+      <select name="tingkat" class="admin-filter-select">
+        <option value="">Semua Tingkat</option>
+        <option value="Ringan" <?= $filter_tingkat === 'Ringan' ? 'selected' : '' ?>>Ringan</option>
+        <option value="Sedang" <?= $filter_tingkat === 'Sedang' ? 'selected' : '' ?>>Sedang</option>
+        <option value="Berat" <?= $filter_tingkat === 'Berat' ? 'selected' : '' ?>>Berat</option>
+      </select>
+      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+      <?php if (!empty($filter_search) || !empty($filter_tingkat)): ?>
+        <a href="<?= BASE_URL ?>/admin/categories.php" class="btn btn-secondary btn-sm">Reset</a>
+      <?php endif; ?>
     </form>
-  </div>
-</div>
-
-<div class="surface-card">
-  <div class="card-header-styled">
-    <div>
-      <h2 class="card-title-styled">Daftar Kategori Pelanggaran</h2>
-      <span class="card-subtitle-styled">Total <?= count($categories) ?> jenis pelanggaran terkonfigurasi</span>
+    <div class="admin-toolbar-meta">
+      Total <strong><?= count($categories) ?></strong> klasifikasi terdaftar
     </div>
   </div>
-  <div class="card-body-styled" style="padding: 0;">
-    <div class="table-responsive">
-      <table class="app-table">
+
+  <div class="table-responsive">
+    <table class="app-table">
         <thead>
           <tr>
             <th>Kode</th>

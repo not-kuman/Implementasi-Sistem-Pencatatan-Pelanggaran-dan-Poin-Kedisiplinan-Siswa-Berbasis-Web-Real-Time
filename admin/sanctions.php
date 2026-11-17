@@ -100,16 +100,17 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<div class="surface-card">
-  <div class="card-header-styled">
+<div class="data-sheet">
+  <div class="admin-toolbar">
     <div>
-      <h2 class="card-title-styled">Matriks Kebijakan Pembinaan Siswa</h2>
-      <span class="card-subtitle-styled">Tersinkronisasi otomatis dengan profil siswa dan dashboard wali</span>
+      <span style="font-size: 13px; font-weight: 600; color: var(--color-primary);">Pedoman Tindakan Disiplin</span>
+    </div>
+    <div class="admin-toolbar-meta">
+      Tersinkronisasi otomatis dengan rekam poin peserta didik
     </div>
   </div>
-  <div class="card-body-styled" style="padding: 0;">
-    <div class="table-responsive">
-      <table class="app-table">
+  <div class="table-responsive">
+    <table class="app-table">
         <thead>
           <tr>
             <th style="text-align: center;">Ambang Rentang Poin</th>

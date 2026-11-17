@@ -84,48 +84,38 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<div class="surface-card" style="margin-bottom: 20px;">
-  <div class="card-body-styled" style="padding: 16px 20px;">
-    <form method="GET" action="<?= BASE_URL ?>/teacher/history.php" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 12px; align-items: flex-end;">
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Pencarian</label>
-        <input type="text" name="search" class="form-control" placeholder="Nama siswa, NIS, kode..." value="<?= e($search) ?>">
+<!-- Integrated Data Sheet & Filter Toolbar -->
+<div class="data-sheet">
+  <div class="admin-toolbar">
+    <form method="GET" action="<?= BASE_URL ?>/teacher/history.php" class="admin-toolbar-form">
+      <div class="admin-search-wrap">
+        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama siswa atau NIS..." value="<?= e($search) ?>">
       </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Tingkat</label>
-        <select name="level" class="form-control">
-          <option value="">Semua Tingkat</option>
-          <option value="Ringan" <?= $filter_level === 'Ringan' ? 'selected' : '' ?>>Ringan</option>
-          <option value="Sedang" <?= $filter_level === 'Sedang' ? 'selected' : '' ?>>Sedang</option>
-          <option value="Berat" <?= $filter_level === 'Berat' ? 'selected' : '' ?>>Berat</option>
-        </select>
-      </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Mulai Tanggal</label>
-        <input type="date" name="start_date" class="form-control" value="<?= e($filter_start) ?>">
-      </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Sampai Tanggal</label>
-        <input type="date" name="end_date" class="form-control" value="<?= e($filter_end) ?>">
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button type="submit" class="btn btn-primary" style="height: 38px;">Filter</button>
-        <a href="<?= BASE_URL ?>/teacher/history.php" class="btn btn-secondary" style="height: 38px;">Reset</a>
-      </div>
-    </form>
-  </div>
-</div>
 
-<div class="surface-card">
-  <div class="card-header-styled">
-    <div>
-      <h2 class="card-title-styled">Daftar Input Pelanggaran</h2>
-      <span class="card-subtitle-styled">Total <?= count($records) ?> catatan ditemukan</span>
+      <select name="level" class="admin-filter-select">
+        <option value="">Semua Tingkat</option>
+        <option value="Ringan" <?= $filter_level === 'Ringan' ? 'selected' : '' ?>>Ringan</option>
+        <option value="Sedang" <?= $filter_level === 'Sedang' ? 'selected' : '' ?>>Sedang</option>
+        <option value="Berat" <?= $filter_level === 'Berat' ? 'selected' : '' ?>>Berat</option>
+      </select>
+
+      <input type="date" name="start_date" class="admin-filter-select" value="<?= e($filter_start) ?>" title="Mulai Tanggal">
+      <input type="date" name="end_date" class="admin-filter-select" value="<?= e($filter_end) ?>" title="Sampai Tanggal">
+
+      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+      <?php if (!empty($search) || !empty($filter_level) || !empty($filter_start) || !empty($filter_end)): ?>
+        <a href="<?= BASE_URL ?>/teacher/history.php" class="btn btn-secondary btn-sm">Reset</a>
+      <?php endif; ?>
+    </form>
+
+    <div class="admin-toolbar-meta">
+      Total <strong><?= count($records) ?></strong> catatan ditemukan
     </div>
   </div>
-  <div class="card-body-styled" style="padding: 0;">
-    <div class="table-responsive">
-      <table class="app-table">
+
+  <div class="table-responsive">
+    <table class="app-table">
         <thead>
           <tr>
             <th>Tanggal Kejadian</th>

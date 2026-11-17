@@ -39,44 +39,48 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="page-header">
   <div>
     <h1 class="page-title">Pencatatan Insiden Pelanggaran Tata Tertib</h1>
-    <p class="page-subtitle">Sistem pembaruan poin otomatis berbasis transaksi basis data & transmisi notifikasi WhatsApp</p>
+    <p class="page-subtitle">Pembaruan rekam jejak kedisiplinan peserta didik dan penerbitan notifikasi wali murid</p>
   </div>
 </div>
 
 <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 24px; align-items: flex-start;">
-  <!-- LEFT: Form Input Interaktif -->
+  <!-- LEFT: Form Sheet Berita Acara Pelanggaran -->
   <div>
-    <div class="surface-card">
-      <div class="card-header-styled">
-        <h2 class="card-title-styled">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Formulir Transaksi Pelanggaran
+    <div class="form-sheet">
+      <div class="form-sheet-header">
+        <h2 style="font-size: 14px; font-weight: 700; color: var(--color-primary); letter-spacing: -0.2px;">
+          Berita Acara Pencatatan Pelanggaran
         </h2>
+        <span style="font-size: 11.5px; color: var(--color-text-muted);">
+          Isi seluruh data insiden kedisiplinan secara faktual dan objektif
+        </span>
       </div>
-      <div class="card-body-styled">
+      <div class="form-sheet-body">
         <form id="violation-form" autocomplete="off">
           <?= csrf_field() ?>
           <input type="hidden" name="teacher_id" value="<?= $teacher_id ?>">
           <input type="hidden" name="student_id" id="selected_student_id" value="">
 
-          <!-- LANGKAH 1: Pencarian & Pemilihan Siswa -->
+          <!-- SEKSI 1: IDENTITAS PESERTA DIDIK -->
+          <div class="form-section-divider" style="margin-top: 0;">1. Identitas Peserta Didik</div>
+          
           <div class="form-group">
             <label class="form-label">
-              1. Cari & Pilih Peserta Didik <span class="required">*</span>
+              Cari &amp; Pilih Siswa <span class="required">*</span>
             </label>
             <div class="autocomplete-wrapper">
               <input type="text" id="student-search-input" class="form-control" placeholder="Ketik nama lengkap atau NIS siswa (minimal 2 huruf)...">
               <div class="autocomplete-dropdown" id="student-dropdown"></div>
             </div>
-            <small style="font-size: 11px; color: var(--color-text-muted);">Sistem akan mencari secara seketika dari pangkalan data siswa aktif.</small>
+            <small style="font-size: 11px; color: var(--color-text-muted);">Pencarian seketika dari pangkalan data siswa terdaftar.</small>
           </div>
 
           <!-- Preview Siswa yang Dipilih -->
-          <div id="student-selected-box" style="display: none; margin-bottom: 20px;">
+          <div id="student-selected-box" style="display: none; margin-bottom: 18px;">
             <div class="student-card-preview">
               <div>
-                <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--color-accent-dark);">Peserta Didik Terpilih:</div>
-                <div style="font-size: 16px; font-weight: 700; color: var(--color-primary); margin-top: 2px;" id="disp_student_name">-</div>
+                <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--color-accent-dark); letter-spacing: 0.5px;">Peserta Didik Terpilih:</div>
+                <div style="font-size: 15px; font-weight: 700; color: var(--color-primary); margin-top: 2px;" id="disp_student_name">-</div>
                 <div style="font-size: 12px; color: var(--color-text-muted);">
                   NIS: <span id="disp_student_nis">-</span> &bull; Kelas: <strong id="disp_student_class">-</strong>
                 </div>
@@ -85,8 +89,8 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
               </div>
               <div style="text-align: right;">
-                <div style="font-size: 11px; color: var(--color-text-muted);">Poin Saat Ini:</div>
-                <span class="badge-points" id="disp_student_points" style="font-size: 16px; padding: 4px 10px;">0 Poin</span>
+                <div style="font-size: 10.5px; color: var(--color-text-muted);">Poin Saat Ini:</div>
+                <span class="badge-points" id="disp_student_points" style="font-size: 15px; padding: 3px 8px;">0 Poin</span>
                 <div style="margin-top: 6px;">
                   <button type="button" class="btn btn-secondary btn-sm" onclick="clearSelectedStudent()">Ganti Siswa</button>
                 </div>
@@ -94,10 +98,31 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
           </div>
 
-          <!-- LANGKAH 2: Kategori Pelanggaran -->
+          <!-- SEKSI 2: INFORMASI WAKTU & TEMPAT -->
+          <div class="form-section-divider">2. Informasi Kejadian</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tanggal Kejadian <span class="required">*</span></label>
+              <input type="date" name="tanggal_kejadian" id="inp_date" class="form-control" required value="<?= date('Y-m-d') ?>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Waktu Kejadian <span class="required">*</span></label>
+              <input type="time" name="waktu_kejadian" id="inp_time" class="form-control" required value="<?= date('H:i') ?>">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lokasi / Tempat Kejadian <span class="required">*</span></label>
+            <input type="text" name="tempat_kejadian" id="inp_location" class="form-control" required value="Lingkungan Sekolah" placeholder="Contoh: Gerbang Utama / Ruang Kelas X MIPA 1 / Kantin">
+          </div>
+
+          <!-- SEKSI 3: KATEGORI & BOBOT POIN -->
+          <div class="form-section-divider">3. Klasifikasi &amp; Bobot Poin</div>
+
           <div class="form-group">
             <label class="form-label">
-              2. Kategori Pelanggaran Tata Tertib <span class="required">*</span>
+              Bentuk Pelanggaran Tata Tertib <span class="required">*</span>
             </label>
             <select name="category_id" id="category_select" class="form-control" required disabled>
               <option value="">-- Pilih Siswa Terlebih Dahulu --</option>
@@ -118,45 +143,31 @@ require_once __DIR__ . '/../includes/header.php';
           </div>
 
           <!-- Live Points Counter Badge -->
-          <div id="points-indicator-box" style="display: none; margin-bottom: 20px; background-color: #FEF3C7; border: 1px solid #FDE68A; padding: 12px 16px; border-radius: var(--radius-md);">
+          <div id="points-indicator-box" style="display: none; margin-bottom: 18px; background-color: #FEF3C7; border: 1px solid #FDE68A; padding: 11px 14px; border-radius: var(--radius-sm);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <span style="font-size: 12px; color: #78350F; font-weight: 600;">Bobot Poin Pelanggaran:</span>
-                <div style="font-size: 16px; font-weight: 800; color: #92400E;" id="disp_added_points">+0 Poin</div>
+                <span style="font-size: 11.5px; color: #78350F; font-weight: 600;">Bobot Pelanggaran:</span>
+                <div style="font-size: 15px; font-weight: 800; color: #92400E;" id="disp_added_points">+0 Poin</div>
               </div>
               <div style="text-align: right;">
-                <span style="font-size: 12px; color: #78350F; font-weight: 600;">Akumulasi Baru Siswa:</span>
-                <div style="font-size: 16px; font-weight: 800; color: #DC2626;" id="disp_projected_total">0 Poin</div>
+                <span style="font-size: 11.5px; color: #78350F; font-weight: 600;">Proyeksi Akumulasi Baru:</span>
+                <div style="font-size: 15px; font-weight: 800; color: #DC2626;" id="disp_projected_total">0 Poin</div>
               </div>
             </div>
           </div>
 
-          <!-- LANGKAH 3: Waktu, Tempat, dan Keterangan -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Tanggal Kejadian <span class="required">*</span></label>
-              <input type="date" name="tanggal_kejadian" id="inp_date" class="form-control" required value="<?= date('Y-m-d') ?>">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Waktu Kejadian <span class="required">*</span></label>
-              <input type="time" name="waktu_kejadian" id="inp_time" class="form-control" required value="<?= date('H:i') ?>">
-            </div>
-          </div>
+          <!-- SEKSI 4: KRONOLOGI KEJADIAN -->
+          <div class="form-section-divider">4. Uraian Fakta Kejadian</div>
 
           <div class="form-group">
-            <label class="form-label">Lokasi / Tempat Kejadian <span class="required">*</span></label>
-            <input type="text" name="tempat_kejadian" id="inp_location" class="form-control" required value="Lingkungan Sekolah" placeholder="Contoh: Gerbang Utama / Ruang Kelas X MIPA 1 / Kantin">
+            <label class="form-label">Deskripsi Kejadian <span class="required">*</span></label>
+            <textarea name="keterangan" id="inp_description" class="form-control" rows="3" required placeholder="Tuliskan kronologi singkat, saksi, dan kondisi faktual kejadian..."></textarea>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Keterangan / Kronologi Kejadian <span class="required">*</span></label>
-            <textarea name="keterangan" id="inp_description" class="form-control" rows="3" required placeholder="Tuliskan fakta kejadian secara objektif dan faktual..."></textarea>
-          </div>
-
-          <!-- Action Button -->
-          <div style="margin-top: 24px;">
-            <button type="submit" id="btn-submit-violation" class="btn btn-accent" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700;" disabled>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <!-- SEKSI 5: SIMPAN & KONFIRMASI -->
+          <div style="margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--color-border-subtle);">
+            <button type="submit" id="btn-submit-violation" class="btn btn-primary" style="width: 100%; padding: 11px; font-size: 13.5px; font-weight: 600;" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               <span>Simpan Catatan Pelanggaran</span>
             </button>
           </div>
@@ -170,18 +181,18 @@ require_once __DIR__ . '/../includes/header.php';
     <!-- Live WhatsApp Bubble Preview -->
     <div class="surface-card">
       <div class="card-header-styled">
-        <h2 class="card-title-styled">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          Pratinjau Pesan WhatsApp Otomatis
-        </h2>
+        <div>
+          <h2 class="card-title-styled">Pratinjau Pemberitahuan WhatsApp</h2>
+          <span class="card-subtitle-styled">Teks resmi yang diteruskan ke orang tua</span>
+        </div>
       </div>
       <div class="card-body-styled">
         <div class="wa-message-card">
           <div class="wa-badge-demo">
-            MODE DEMO SIMULATOR AKTIF
+            MODE SIMULASI DEMO
           </div>
           <div style="font-size: 11px; color: #54656F; margin-bottom: 6px;">
-            Format notifikasi resmi kedisiplinan:
+            Format notifikasi kedisiplinan:
           </div>
           <div class="wa-bubble" id="wa-preview-text">Yth. Bapak/Ibu Wali Siswa,
 
@@ -203,15 +214,15 @@ Terima kasih.
     <!-- Sanksi Reference Card -->
     <div class="surface-card">
       <div class="card-header-styled">
-        <h2 class="card-title-styled">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Proyeksi Tindak Lanjut Sanksi
-        </h2>
+        <div>
+          <h2 class="card-title-styled">Proyeksi Tindak Lanjut Sanksi</h2>
+          <span class="card-subtitle-styled">Tingkat pembinaan berdasarkan akumulasi poin baru</span>
+        </div>
       </div>
       <div class="card-body-styled" style="padding: 16px 20px;">
-        <div id="projected-sanction-box" style="padding: 12px; background: #F8FAFC; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
-          <div style="font-size: 11.5px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">Status Pembinaan Setelah Input:</div>
-          <div style="font-size: 14px; font-weight: 700; color: var(--color-primary); margin-top: 4px;" id="disp_sanction_title">
+        <div id="projected-sanction-box" style="padding: 12px; background: #F8FAFC; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700;">Status Pembinaan Proyektif:</div>
+          <div style="font-size: 13.5px; font-weight: 700; color: var(--color-primary); margin-top: 3px;" id="disp_sanction_title">
             Tertib (Belum ada sanksi)
           </div>
           <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 2px;" id="disp_sanction_action">
@@ -220,7 +231,7 @@ Terima kasih.
         </div>
 
         <div style="margin-top: 14px; border-top: 1px dashed var(--color-border); padding-top: 10px;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--color-text-subtle); text-transform: uppercase; margin-bottom: 6px;">Tolak Ukur Ambang Poin Sekolah:</div>
+          <div style="font-size: 10.5px; font-weight: 700; color: var(--color-text-subtle); text-transform: uppercase; margin-bottom: 6px;">Tolak Ukur Ambang Poin Sekolah:</div>
           <?php foreach ($sanctions as $sc): ?>
             <div style="display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; border-bottom: 1px solid #F1F5F9;">
               <span><?= e($sc['nama_sanksi']) ?></span>

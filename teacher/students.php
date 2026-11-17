@@ -56,42 +56,35 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<div class="surface-card" style="margin-bottom: 20px;">
-  <div class="card-body-styled" style="padding: 16px 20px;">
-    <form method="GET" action="<?= BASE_URL ?>/teacher/students.php" style="display: flex; gap: 14px; align-items: flex-end;">
-      <div style="flex: 1;">
-        <label class="form-label" style="margin-bottom: 4px;">Pencarian Siswa</label>
-        <input type="text" name="search" class="form-control" placeholder="Ketik nama lengkap atau NIS siswa..." value="<?= e($search) ?>">
+<!-- Integrated Data Sheet & Filter Toolbar -->
+<div class="data-sheet">
+  <div class="admin-toolbar">
+    <form method="GET" action="<?= BASE_URL ?>/teacher/students.php" class="admin-toolbar-form">
+      <div class="admin-search-wrap">
+        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama atau NIS siswa..." value="<?= e($search) ?>">
       </div>
-      <div style="width: 220px;">
-        <label class="form-label" style="margin-bottom: 4px;">Filter Kelas</label>
-        <select name="class_id" class="form-control">
-          <option value="0">Semua Kelas</option>
-          <?php foreach ($classes_list as $cls): ?>
-            <option value="<?= $cls['id'] ?>" <?= $filter_class == $cls['id'] ? 'selected' : '' ?>><?= e($cls['nama_kelas']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button type="submit" class="btn btn-primary" style="height: 38px;">Cari</button>
-        <?php if (!empty($search) || $filter_class > 0): ?>
-          <a href="<?= BASE_URL ?>/teacher/students.php" class="btn btn-secondary" style="height: 38px;">Reset</a>
-        <?php endif; ?>
-      </div>
-    </form>
-  </div>
-</div>
 
-<div class="surface-card">
-  <div class="card-header-styled">
-    <div>
-      <h2 class="card-title-styled">Daftar Siswa</h2>
-      <span class="card-subtitle-styled">Total <?= count($students) ?> siswa aktif</span>
+      <select name="class_id" class="admin-filter-select">
+        <option value="0">Semua Rombel</option>
+        <?php foreach ($classes_list as $cls): ?>
+          <option value="<?= $cls['id'] ?>" <?= $filter_class == $cls['id'] ? 'selected' : '' ?>><?= e($cls['nama_kelas']) ?></option>
+        <?php endforeach; ?>
+      </select>
+
+      <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
+      <?php if (!empty($search) || $filter_class > 0): ?>
+        <a href="<?= BASE_URL ?>/teacher/students.php" class="btn btn-secondary btn-sm">Reset</a>
+      <?php endif; ?>
+    </form>
+
+    <div class="admin-toolbar-meta">
+      Total <strong><?= count($students) ?></strong> siswa aktif
     </div>
   </div>
-  <div class="card-body-styled" style="padding: 0;">
-    <div class="table-responsive">
-      <table class="app-table">
+
+  <div class="table-responsive">
+    <table class="app-table">
         <thead>
           <tr>
             <th>NIS</th>

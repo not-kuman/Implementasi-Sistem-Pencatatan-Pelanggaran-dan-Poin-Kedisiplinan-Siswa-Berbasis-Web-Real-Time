@@ -113,8 +113,8 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">Riwayat Transaksi Pelanggaran Kedisiplinan</h1>
-    <p class="page-subtitle">Daftar lengkap audit rekam jejak pelanggaran siswa dan status notifikasi orang tua</p>
+    <h1 class="page-title">Buku Catatan Pelanggaran Kedisiplinan</h1>
+    <p class="page-subtitle">Arsip rekam jejak kedisiplinan peserta didik dan riwayat pemberitahuan wali siswa</p>
   </div>
   <div class="page-actions">
     <a href="<?= BASE_URL ?>/admin/reports.php" class="btn btn-secondary">
@@ -124,156 +124,141 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Advanced Filter Bar -->
-<div class="surface-card" style="margin-bottom: 20px;">
-  <div class="card-body-styled" style="padding: 16px 20px;">
-    <form method="GET" action="<?= BASE_URL ?>/admin/violations.php" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 12px; align-items: flex-end;">
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Pencarian</label>
-        <input type="text" name="search" class="form-control" placeholder="Nama siswa, NIS, jenis pelanggaran..." value="<?= e($search) ?>">
+<!-- Integrated Data Sheet & Filter Toolbar -->
+<div class="data-sheet">
+  <div class="admin-toolbar">
+    <form method="GET" action="<?= BASE_URL ?>/admin/violations.php" class="admin-toolbar-form">
+      <div class="admin-search-wrap">
+        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama, NIS, pelanggaran..." value="<?= e($search) ?>">
       </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Rombel / Kelas</label>
-        <select name="class_id" class="form-control">
-          <option value="0">Semua Kelas</option>
-          <?php foreach ($classes_list as $cls): ?>
-            <option value="<?= $cls['id'] ?>" <?= $filter_class == $cls['id'] ? 'selected' : '' ?>><?= e($cls['nama_kelas']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Tingkat</label>
-        <select name="level" class="form-control">
-          <option value="">Semua Tingkat</option>
-          <option value="Ringan" <?= $filter_level === 'Ringan' ? 'selected' : '' ?>>Ringan</option>
-          <option value="Sedang" <?= $filter_level === 'Sedang' ? 'selected' : '' ?>>Sedang</option>
-          <option value="Berat" <?= $filter_level === 'Berat' ? 'selected' : '' ?>>Berat</option>
-        </select>
-      </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Dari Tanggal</label>
-        <input type="date" name="start_date" class="form-control" value="<?= e($filter_start) ?>">
-      </div>
-      <div>
-        <label class="form-label" style="margin-bottom: 4px;">Sampai Tanggal</label>
-        <input type="date" name="end_date" class="form-control" value="<?= e($filter_end) ?>">
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button type="submit" class="btn btn-primary" style="height: 38px;">Filter</button>
-        <a href="<?= BASE_URL ?>/admin/violations.php" class="btn btn-secondary" style="height: 38px;">Reset</a>
-      </div>
-    </form>
-  </div>
-</div>
 
-<!-- Table -->
-<div class="surface-card">
-  <div class="card-header-styled">
-    <div>
-      <h2 class="card-title-styled">Daftar Rekam Jejak Pelanggaran</h2>
-      <span class="card-subtitle-styled">Menampilkan <?= count($records) ?> dari <?= $total_rows ?> catatan pelanggaran</span>
+      <select name="class_id" class="admin-filter-select">
+        <option value="0">Semua Rombel</option>
+        <?php foreach ($classes_list as $cls): ?>
+          <option value="<?= $cls['id'] ?>" <?= $filter_class == $cls['id'] ? 'selected' : '' ?>><?= e($cls['nama_kelas']) ?></option>
+        <?php endforeach; ?>
+      </select>
+
+      <select name="level" class="admin-filter-select">
+        <option value="">Semua Tingkat</option>
+        <option value="Ringan" <?= $filter_level === 'Ringan' ? 'selected' : '' ?>>Ringan</option>
+        <option value="Sedang" <?= $filter_level === 'Sedang' ? 'selected' : '' ?>>Sedang</option>
+        <option value="Berat" <?= $filter_level === 'Berat' ? 'selected' : '' ?>>Berat</option>
+      </select>
+
+      <input type="date" name="start_date" class="admin-filter-select" value="<?= e($filter_start) ?>" title="Dari Tanggal">
+      <input type="date" name="end_date" class="admin-filter-select" value="<?= e($filter_end) ?>" title="Sampai Tanggal">
+
+      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+      <?php if (!empty($search) || $filter_class > 0 || !empty($filter_level) || !empty($filter_start) || !empty($filter_end)): ?>
+        <a href="<?= BASE_URL ?>/admin/violations.php" class="btn btn-secondary btn-sm">Reset</a>
+      <?php endif; ?>
+    </form>
+
+    <div class="admin-toolbar-meta">
+      Total <strong><?= $total_rows ?></strong> rekam insiden tercatat
     </div>
   </div>
-  <div class="card-body-styled" style="padding: 0;">
-    <div class="table-responsive">
-      <table class="app-table">
-        <thead>
+
+  <div class="table-responsive">
+    <table class="app-table">
+      <thead>
+        <tr>
+          <th>Tanggal Kejadian</th>
+          <th>Peserta Didik</th>
+          <th>Bentuk Pelanggaran</th>
+          <th>Tingkat</th>
+          <th style="text-align: center;">Poin</th>
+          <th>Guru Pelapor</th>
+          <th>WhatsApp</th>
+          <th>Status Kasus</th>
+          <th style="text-align: right;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (empty($records)): ?>
           <tr>
-            <th>Tanggal Kejadian</th>
-            <th>Peserta Didik</th>
-            <th>Bentuk Pelanggaran</th>
-            <th>Tingkat</th>
-            <th style="text-align: center;">Poin</th>
-            <th>Guru Pelapor</th>
-            <th>WhatsApp</th>
-            <th>Status Kasus</th>
-            <th style="text-align: right;">Aksi</th>
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-state-title">Tidak ada data pelanggaran</div>
+                <div class="empty-state-text">Sesuaikan parameter filter atau cari kata kunci lain.</div>
+              </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <?php if (empty($records)): ?>
+        <?php else: ?>
+          <?php foreach ($records as $r): 
+            $sev_class = ($r['tingkat'] === 'Berat') ? 'badge-berat' : (($r['tingkat'] === 'Sedang') ? 'badge-sedang' : 'badge-ringan');
+          ?>
             <tr>
-              <td colspan="9">
-                <div class="empty-state">
-                  <div class="empty-state-title">Tidak ada data pelanggaran</div>
-                  <div class="empty-state-text">Sesuaikan parameter filter atau cari kata kunci lain.</div>
+              <td>
+                <div style="font-size: 12px; font-weight: 600; color: var(--color-primary);"><?= format_date_id($r['tanggal_kejadian']) ?></div>
+                <div style="font-size: 11px; color: var(--color-text-muted);"><?= substr($r['waktu_kejadian'], 0, 5) ?> WIB</div>
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--color-primary);"><?= e($r['nama_siswa']) ?></div>
+                <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($r['nis']) ?> &bull; <?= e($r['nama_kelas']) ?></div>
+              </td>
+              <td>
+                <div style="font-size: 12.5px; max-width: 240px; font-weight: 500;" title="<?= e($r['nama_pelanggaran']) ?>">
+                  <?= e($r['nama_pelanggaran']) ?>
                 </div>
               </td>
-            </tr>
-          <?php else: ?>
-            <?php foreach ($records as $r): 
-              $sev_class = ($r['tingkat'] === 'Berat') ? 'badge-berat' : (($r['tingkat'] === 'Sedang') ? 'badge-sedang' : 'badge-ringan');
-            ?>
-              <tr>
-                <td>
-                  <div style="font-size: 12px; font-weight: 600; color: var(--color-primary);"><?= format_date_id($r['tanggal_kejadian']) ?></div>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= substr($r['waktu_kejadian'], 0, 5) ?> WIB</div>
-                </td>
-                <td>
-                  <div style="font-weight: 600; color: var(--color-primary);"><?= e($r['nama_siswa']) ?></div>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($r['nis']) ?> &bull; <?= e($r['nama_kelas']) ?></div>
-                </td>
-                <td>
-                  <div style="font-size: 12.5px; max-width: 240px; font-weight: 500;" title="<?= e($r['nama_pelanggaran']) ?>">
-                    <?= e($r['nama_pelanggaran']) ?>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge <?= $sev_class ?>"><?= e($r['tingkat']) ?></span>
-                </td>
-                <td style="text-align: center;">
-                  <span class="badge-points danger" style="font-weight: 700;">+<?= (int)$r['poin'] ?></span>
-                </td>
-                <td>
-                  <span style="font-size: 12px; font-weight: 500; color: var(--color-text-main);"><?= e($r['nama_guru']) ?></span>
-                </td>
-                <td>
-                  <?php if ($r['wa_status'] === 'sent' || $r['wa_status'] === 'simulated'): ?>
-                    <span class="badge" style="background-color: #EBF6F0; color: #166534; font-size: 11px;">
-                      <?= $r['wa_status'] === 'simulated' ? 'Terkirim (DEMO)' : 'Terkirim' ?>
-                    </span>
-                  <?php elseif ($r['wa_status'] === 'failed'): ?>
-                    <span class="badge" style="background-color: #FEF2F2; color: #DC2626; font-size: 11px;">Gagal</span>
-                  <?php else: ?>
-                    <span style="font-size: 11px; color: var(--color-text-subtle);">Belum Dikirim</span>
-                  <?php endif; ?>
-                </td>
-                <td>
-                  <span class="status-pill <?= strtolower($r['status_tindak_lanjut']) ?>">
-                    <span class="status-dot"></span>
-                    <?= e($r['status_tindak_lanjut']) ?>
+              <td>
+                <span class="badge <?= $sev_class ?>"><?= e($r['tingkat']) ?></span>
+              </td>
+              <td style="text-align: center;">
+                <span class="badge-points danger" style="font-weight: 700;">+<?= (int)$r['poin'] ?></span>
+              </td>
+              <td>
+                <span style="font-size: 12px; font-weight: 500; color: var(--color-text-main);"><?= e($r['nama_guru']) ?></span>
+              </td>
+              <td>
+                <?php if ($r['wa_status'] === 'sent' || $r['wa_status'] === 'simulated'): ?>
+                  <span class="badge" style="background-color: #EBF6F0; color: #166534; font-size: 11px;">
+                    <?= $r['wa_status'] === 'simulated' ? 'Terkirim (DEMO)' : 'Terkirim' ?>
                   </span>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="viewDetail(<?= (int)$r['id'] ?>)" title="Detail Lengkap & Notifikasi">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteRecord(<?= (int)$r['id'] ?>, '<?= e(addslashes($r['nama_siswa'])) ?>')" style="color: var(--color-danger);" title="Hapus Catatan & Kurangi Poin Siswa">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                  </button>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    <?php if ($total_pages > 1): ?>
-      <div class="pagination-wrapper" style="padding: 16px 20px;">
-        <span class="pagination-info">Halaman <?= $page ?> dari <?= $total_pages ?></span>
-        <div class="pagination-links">
-          <?php for ($p = 1; $p <= $total_pages; $p++): ?>
-            <a href="<?= BASE_URL ?>/admin/violations.php?page=<?= $p ?>&search=<?= urlencode($search) ?>&class_id=<?= $filter_class ?>&level=<?= urlencode($filter_level) ?>&start_date=<?= $filter_start ?>&end_date=<?= $filter_end ?>" 
-               class="page-btn <?= $p === $page ? 'active' : '' ?>">
-              <?= $p ?>
-            </a>
-          <?php endfor; ?>
-        </div>
-      </div>
-    <?php endif; ?>
+                <?php elseif ($r['wa_status'] === 'failed'): ?>
+                  <span class="badge" style="background-color: #FEF2F2; color: #DC2626; font-size: 11px;">Gagal</span>
+                <?php else: ?>
+                  <span style="font-size: 11px; color: var(--color-text-subtle);">Belum Dikirim</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <span class="status-pill <?= strtolower($r['status_tindak_lanjut']) ?>">
+                  <span class="status-dot"></span>
+                  <?= e($r['status_tindak_lanjut']) ?>
+                </span>
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="viewDetail(<?= (int)$r['id'] ?>)" title="Detail Lengkap & Notifikasi">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="deleteRecord(<?= (int)$r['id'] ?>, '<?= e(addslashes($r['nama_siswa'])) ?>')" style="color: var(--color-danger);" title="Hapus Catatan & Kurangi Poin Siswa">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </tbody>
+    </table>
   </div>
+
+  <!-- Pagination -->
+  <?php if ($total_pages > 1): ?>
+    <div class="pagination-wrapper" style="padding: 14px 20px;">
+      <span class="pagination-info">Halaman <?= $page ?> dari <?= $total_pages ?></span>
+      <div class="pagination-links">
+        <?php for ($p = 1; $p <= $total_pages; $p++): ?>
+          <a href="<?= BASE_URL ?>/admin/violations.php?page=<?= $p ?>&search=<?= urlencode($search) ?>&class_id=<?= $filter_class ?>&level=<?= urlencode($filter_level) ?>&start_date=<?= $filter_start ?>&end_date=<?= $filter_end ?>" 
+             class="page-btn <?= $p === $page ? 'active' : '' ?>">
+            <?= $p ?>
+          </a>
+        <?php endfor; ?>
+      </div>
+    </div>
+  <?php endif; ?>
 </div>
 
 <!-- Modal Detail Pelanggaran & Log WhatsApp -->

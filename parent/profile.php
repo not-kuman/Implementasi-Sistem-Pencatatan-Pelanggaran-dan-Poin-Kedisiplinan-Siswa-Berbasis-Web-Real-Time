@@ -46,10 +46,10 @@ require_once __DIR__ . '/../includes/header.php';
   <!-- Biodata Card -->
   <div class="surface-card">
     <div class="card-header-styled">
-      <h2 class="card-title-styled">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Biodata Peserta Didik
-      </h2>
+      <div>
+        <h2 class="card-title-styled">Biodata Peserta Didik</h2>
+        <span class="card-subtitle-styled">Data induk kesiswaan yang terdaftar</span>
+      </div>
     </div>
     <div class="card-body-styled">
       <div style="text-align: center; margin-bottom: 20px;">
@@ -96,10 +96,10 @@ require_once __DIR__ . '/../includes/header.php';
   <!-- Sanctions & School Code Guide -->
   <div class="surface-card">
     <div class="card-header-styled">
-      <h2 class="card-title-styled">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Pedoman Pembinaan & Ambang Sanksi Sekolah
-      </h2>
+      <div>
+        <h2 class="card-title-styled">Pedoman Pembinaan &amp; Ambang Sanksi Sekolah</h2>
+        <span class="card-subtitle-styled">Tolak ukur intervensi kedisiplinan dan pembinaan</span>
+      </div>
     </div>
     <div class="card-body-styled">
       <p style="font-size: 12.5px; color: var(--color-text-muted); margin-bottom: 16px; line-height: 1.5;">

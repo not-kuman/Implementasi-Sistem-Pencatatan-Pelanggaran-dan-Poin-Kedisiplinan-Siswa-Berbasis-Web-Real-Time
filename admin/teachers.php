@@ -170,99 +170,92 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Search Bar -->
-<div class="surface-card" style="margin-bottom: 20px;">
-  <div class="card-body-styled" style="padding: 16px 20px;">
-    <form method="GET" action="<?= BASE_URL ?>/admin/teachers.php" style="display: flex; gap: 12px; align-items: center;">
-      <div style="flex: 1;">
-        <input type="text" name="search" class="form-control" placeholder="Cari nama guru, NIP, atau jabatan..." value="<?= e($search) ?>">
+<!-- Teachers Data Sheet with Integrated Toolbar -->
+<div class="data-sheet">
+  <div class="admin-toolbar">
+    <form method="GET" action="<?= BASE_URL ?>/admin/teachers.php" class="admin-toolbar-form">
+      <div class="admin-search-wrap">
+        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama guru, NIP, atau peranan..." value="<?= e($search) ?>">
       </div>
-      <button type="submit" class="btn btn-primary">Cari</button>
+      <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
       <?php if (!empty($search)): ?>
-        <a href="<?= BASE_URL ?>/admin/teachers.php" class="btn btn-secondary">Reset</a>
+        <a href="<?= BASE_URL ?>/admin/teachers.php" class="btn btn-secondary btn-sm">Reset</a>
       <?php endif; ?>
     </form>
-  </div>
-</div>
-
-<!-- Table -->
-<div class="surface-card">
-  <div class="card-header-styled">
-    <div>
-      <h2 class="card-title-styled">Daftar Tenaga Pendidik</h2>
-      <span class="card-subtitle-styled">Total <?= count($teachers) ?> pendidik terdaftar</span>
+    <div class="admin-toolbar-meta">
+      Total <strong><?= count($teachers) ?></strong> tenaga pendidik terdaftar
     </div>
   </div>
-  <div class="card-body-styled" style="padding: 0;">
-    <div class="table-responsive">
-      <table class="app-table">
-        <thead>
+
+  <div class="table-responsive">
+    <table class="app-table">
+      <thead>
+        <tr>
+          <th>NIP</th>
+          <th>Nama Guru</th>
+          <th>JK</th>
+          <th>Jabatan / Peran</th>
+          <th>Kontak HP</th>
+          <th>Akun Portal</th>
+          <th style="text-align: center;">Pelanggaran Dicatat</th>
+          <th style="text-align: right;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (empty($teachers)): ?>
           <tr>
-            <th>NIP</th>
-            <th>Nama Guru</th>
-            <th>JK</th>
-            <th>Jabatan / Peran</th>
-            <th>Kontak HP</th>
-            <th>Akun Portal</th>
-            <th style="text-align: center;">Pelanggaran Dicatat</th>
-            <th style="text-align: right;">Aksi</th>
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-state-title">Belum ada data guru</div>
+                <div class="empty-state-text">Silakan tambahkan data guru baru ke dalam sistem.</div>
+              </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <?php if (empty($teachers)): ?>
+        <?php else: ?>
+          <?php foreach ($teachers as $t): ?>
             <tr>
-              <td colspan="8">
-                <div class="empty-state">
-                  <div class="empty-state-title">Belum ada data guru</div>
-                  <div class="empty-state-text">Silakan tambahkan data guru baru ke dalam sistem.</div>
-                </div>
+              <td>
+                <span style="font-family: var(--font-mono); font-weight: 600; color: var(--color-primary);"><?= e($t['nip']) ?></span>
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--color-primary);"><?= e($t['nama_guru']) ?></div>
+                <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($t['email'] ?: '-') ?></div>
+              </td>
+              <td>
+                <span class="badge" style="background-color: #F1F5F9;"><?= $t['jenis_kelamin'] === 'L' ? 'L' : 'P' ?></span>
+              </td>
+              <td>
+                <span style="font-size: 12.5px; font-weight: 600; color: var(--color-accent-dark);"><?= e($t['jabatan']) ?></span>
+              </td>
+              <td>
+                <span style="font-family: var(--font-mono); font-size: 12px;"><?= e($t['no_telp']) ?></span>
+              </td>
+              <td>
+                <?php if ($t['username']): ?>
+                  <span class="badge" style="background-color: #EBF4F3; color: var(--color-accent-dark); font-family: var(--font-mono);">
+                    @<?= e($t['username']) ?>
+                  </span>
+                <?php else: ?>
+                  <span style="font-size: 11.5px; color: var(--color-text-subtle);">Belum dibuat</span>
+                <?php endif; ?>
+              </td>
+              <td style="text-align: center;">
+                <span class="badge" style="background-color: #F1F5F9; font-weight: 700;"><?= (int)$t['total_catatan'] ?> Kasus</span>
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick='editTeacher(<?= json_encode($t) ?>)' title="Ubah Data">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="deleteTeacher(<?= (int)$t['id'] ?>, '<?= e(addslashes($t['nama_guru'])) ?>')" style="color: var(--color-danger);" title="Hapus">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
               </td>
             </tr>
-          <?php else: ?>
-            <?php foreach ($teachers as $t): ?>
-              <tr>
-                <td>
-                  <span style="font-family: var(--font-mono); font-weight: 600; color: var(--color-primary);"><?= e($t['nip']) ?></span>
-                </td>
-                <td>
-                  <div style="font-weight: 600; color: var(--color-primary);"><?= e($t['nama_guru']) ?></div>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($t['email'] ?: '-') ?></div>
-                </td>
-                <td>
-                  <span class="badge" style="background-color: #F1F5F9;"><?= $t['jenis_kelamin'] === 'L' ? 'L' : 'P' ?></span>
-                </td>
-                <td>
-                  <span style="font-size: 12.5px; font-weight: 600; color: var(--color-accent-dark);"><?= e($t['jabatan']) ?></span>
-                </td>
-                <td>
-                  <span style="font-family: var(--font-mono); font-size: 12px;"><?= e($t['no_telp']) ?></span>
-                </td>
-                <td>
-                  <?php if ($t['username']): ?>
-                    <span class="badge" style="background-color: #EBF4F3; color: var(--color-accent-dark); font-family: var(--font-mono);">
-                      @<?= e($t['username']) ?>
-                    </span>
-                  <?php else: ?>
-                    <span style="font-size: 11.5px; color: var(--color-text-subtle);">Belum dibuat</span>
-                  <?php endif; ?>
-                </td>
-                <td style="text-align: center;">
-                  <span class="badge" style="background-color: #F1F5F9; font-weight: 700;"><?= (int)$t['total_catatan'] ?> Kasus</span>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <button type="button" class="btn btn-secondary btn-sm" onclick='editTeacher(<?= json_encode($t) ?>)' title="Ubah Data">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  </button>
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteTeacher(<?= (int)$t['id'] ?>, '<?= e(addslashes($t['nama_guru'])) ?>')" style="color: var(--color-danger);" title="Hapus">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                  </button>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </tbody>
+    </table>
   </div>
 </div>
 
