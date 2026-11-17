@@ -123,83 +123,83 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<div class="data-sheet">
-  <div class="admin-toolbar">
+<div class="surface-card">
+  <div class="card-header-styled">
     <div>
-      <span style="font-size: 13px; font-weight: 600; color: var(--color-primary);">Arsip Rombongan Belajar</span>
-    </div>
-    <div class="admin-toolbar-meta">
-      Total <strong><?= count($classes) ?></strong> rombel terdaftar
+      <h2 class="card-title-styled">Daftar Kelas</h2>
+      <span class="card-subtitle-styled">Total <?= count($classes) ?> rombongan belajar aktif</span>
     </div>
   </div>
-  <div class="table-responsive">
-    <table class="app-table">
-      <thead>
-        <tr>
-          <th>Nama Kelas</th>
-          <th>Tingkat</th>
-          <th>Jurusan</th>
-          <th>Wali Kelas</th>
-          <th style="text-align: center;">Jumlah Siswa</th>
-          <th style="text-align: center;">Total Poin Rombel</th>
-          <th>Tahun Ajaran</th>
-          <th style="text-align: right;">Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (empty($classes)): ?>
+  <div class="card-body-styled" style="padding: 0;">
+    <div class="table-responsive">
+      <table class="app-table">
+        <thead>
           <tr>
-            <td colspan="8">
-              <div class="empty-state">
-                <div class="empty-state-title">Belum ada rombongan belajar</div>
-                <div class="empty-state-text">Silakan tambahkan data kelas baru ke dalam sistem.</div>
-              </div>
-            </td>
+            <th>Nama Kelas</th>
+            <th>Tingkat</th>
+            <th>Jurusan</th>
+            <th>Wali Kelas</th>
+            <th style="text-align: center;">Jumlah Siswa</th>
+            <th style="text-align: center;">Total Poin Rombel</th>
+            <th>Tahun Ajaran</th>
+            <th style="text-align: right;">Aksi</th>
           </tr>
-        <?php else: ?>
-          <?php foreach ($classes as $c): ?>
+        </thead>
+        <tbody>
+          <?php if (empty($classes)): ?>
             <tr>
-              <td>
-                <span style="font-weight: 700; color: var(--color-primary); font-size: 13.5px;"><?= e($c['nama_kelas']) ?></span>
-              </td>
-              <td>
-                <span class="badge" style="background-color: #E2E8F0; color: var(--color-primary);"><?= e($c['tingkat']) ?></span>
-              </td>
-              <td>
-                <span style="font-weight: 600; color: var(--color-accent-dark);"><?= e($c['jurusan']) ?></span>
-              </td>
-              <td>
-                <?php if (!empty($c['wali_kelas_nama'])): ?>
-                  <div style="font-weight: 600; color: var(--color-primary);"><?= e($c['wali_kelas_nama']) ?></div>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($c['wali_kelas_telp'] ?: '-') ?></div>
-                <?php else: ?>
-                  <span style="font-size: 11.5px; color: var(--color-text-subtle);">Belum ditetapkan</span>
-                <?php endif; ?>
-              </td>
-              <td style="text-align: center;">
-                <span style="font-weight: 700; color: var(--color-primary);"><?= (int)$c['total_siswa'] ?> Siswa</span>
-              </td>
-              <td style="text-align: center;">
-                <span class="badge-points <?= $c['total_poin_kelas'] > 50 ? 'danger' : 'warning' ?>">
-                  <?= (int)$c['total_poin_kelas'] ?> Poin
-                </span>
-              </td>
-              <td>
-                <span style="font-family: var(--font-mono); font-size: 12px;"><?= e($c['tahun_ajaran']) ?></span>
-              </td>
-              <td style="text-align: right; white-space: nowrap;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick='editClass(<?= json_encode($c) ?>)' title="Ubah Data">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="deleteClass(<?= (int)$c['id'] ?>, '<?= e(addslashes($c['nama_kelas'])) ?>')" style="color: var(--color-danger);" title="Hapus">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
+              <td colspan="8">
+                <div class="empty-state">
+                  <div class="empty-state-title">Belum ada rombongan belajar</div>
+                  <div class="empty-state-text">Silakan tambahkan data kelas baru ke dalam sistem.</div>
+                </div>
               </td>
             </tr>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </tbody>
-    </table>
+          <?php else: ?>
+            <?php foreach ($classes as $c): ?>
+              <tr>
+                <td>
+                  <span style="font-weight: 700; color: var(--color-primary); font-size: 14px;"><?= e($c['nama_kelas']) ?></span>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: #E2E8F0; color: var(--color-primary);"><?= e($c['tingkat']) ?></span>
+                </td>
+                <td>
+                  <span style="font-weight: 600; color: var(--color-accent-dark);"><?= e($c['jurusan']) ?></span>
+                </td>
+                <td>
+                  <?php if (!empty($c['wali_kelas_nama'])): ?>
+                    <div style="font-weight: 600; color: var(--color-primary);"><?= e($c['wali_kelas_nama']) ?></div>
+                    <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($c['wali_kelas_telp'] ?: '-') ?></div>
+                  <?php else: ?>
+                    <span style="font-size: 11.5px; color: var(--color-text-subtle);">Belum ditetapkan</span>
+                  <?php endif; ?>
+                </td>
+                <td style="text-align: center;">
+                  <span style="font-weight: 700; color: var(--color-primary);"><?= (int)$c['total_siswa'] ?> Siswa</span>
+                </td>
+                <td style="text-align: center;">
+                  <span class="badge-points <?= $c['total_poin_kelas'] > 50 ? 'danger' : 'warning' ?>">
+                    <?= (int)$c['total_poin_kelas'] ?> Poin
+                  </span>
+                </td>
+                <td>
+                  <span style="font-family: var(--font-mono); font-size: 12px;"><?= e($c['tahun_ajaran']) ?></span>
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick='editClass(<?= json_encode($c) ?>)' title="Ubah Data">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteClass(<?= (int)$c['id'] ?>, '<?= e(addslashes($c['nama_kelas'])) ?>')" style="color: var(--color-danger);" title="Hapus">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

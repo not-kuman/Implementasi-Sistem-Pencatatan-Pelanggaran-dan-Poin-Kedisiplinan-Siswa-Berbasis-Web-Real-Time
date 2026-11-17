@@ -215,6 +215,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
   </div>
 
+  <div class="table-responsive">
   <table class="app-table" style="font-size: 12px;">
     <thead>
       <tr style="background: #F1F5F9;">
@@ -256,12 +257,13 @@ require_once __DIR__ . '/../includes/header.php';
     </tbody>
     <tfoot>
       <tr style="background: #F8FAFC; font-weight: 700;">
-        <td colspan="8" style="text-align: right; padding: 10px 16px;">TOTAL POIN KELUAR:</td>
+        <td colspan="7" style="text-align: right; padding: 10px 16px;">TOTAL POIN KELUAR:</td>
         <td style="text-align: center; color: #DC2626; font-size: 13px;">+<?= $total_points_recap ?></td>
         <td></td>
       </tr>
     </tfoot>
   </table>
+  </div>
 
   <!-- Official Signatures Section for School Administration -->
   <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; page-break-inside: avoid;">

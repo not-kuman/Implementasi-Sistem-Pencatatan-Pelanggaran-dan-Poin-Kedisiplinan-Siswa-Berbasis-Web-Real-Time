@@ -71,28 +71,28 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Child Overview & Discipline Status -->
-<div style="display: grid; grid-template-columns: 1.1fr 1.3fr; gap: 20px; margin-bottom: 24px;">
+<!-- Child Overview & Discipline Gauge Grid -->
+<div class="grid-two-column" style="margin-bottom: 24px;">
   <!-- Student Identity Card -->
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
-      <div>
-        <h2 class="card-title-styled">Identitas Peserta Didik</h2>
-        <span class="card-subtitle-styled">Data pangkalan kesiswaan yang terdaftar</span>
-      </div>
+      <h2 class="card-title-styled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Identitas Peserta Didik
+      </h2>
     </div>
     <div class="card-body-styled">
-      <div style="font-size: 17px; font-weight: 700; color: var(--color-primary);"><?= e($child['nama_lengkap']) ?></div>
-      <div style="font-size: 12.5px; color: var(--color-text-muted); margin-top: 4px;">
+      <div style="font-size: 18px; font-weight: 700; color: var(--color-primary);"><?= e($child['nama_lengkap']) ?></div>
+      <div style="font-size: 13px; color: var(--color-text-muted); margin-top: 4px;">
         Nomor Induk Siswa: <strong style="font-family: var(--font-mono); color: var(--color-primary);"><?= e($child['nis']) ?></strong>
       </div>
-      <div style="font-size: 12.5px; color: var(--color-text-muted); margin-top: 3px;">
+      <div style="font-size: 13px; color: var(--color-text-muted); margin-top: 4px;">
         Rombongan Belajar: <strong style="color: var(--color-accent-dark);"><?= e($child['nama_kelas']) ?></strong> (<?= e($child['jurusan']) ?>)
       </div>
-      <div style="font-size: 12.5px; color: var(--color-text-muted); margin-top: 3px;">
+      <div style="font-size: 13px; color: var(--color-text-muted); margin-top: 4px;">
         Wali Kelas: <strong><?= e($child['nama_wali_kelas'] ?: '-') ?></strong>
       </div>
-      <div style="font-size: 11.5px; color: var(--color-text-muted); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--color-border);">
+      <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--color-border);">
         Wali Terhubung: <strong><?= e($user['nama_wali'] ?? $user['full_name']) ?></strong> (<?= e($user['hubungan'] ?? 'Wali') ?>)
       </div>
     </div>
@@ -101,50 +101,52 @@ require_once __DIR__ . '/../includes/header.php';
   <!-- Status & Panduan Pembinaan Tata Tertib -->
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
-      <div>
-        <h2 class="card-title-styled">Status Tata Tertib &amp; Pembinaan</h2>
-        <span class="card-subtitle-styled">Pedoman evaluasi kedisiplinan sekolah</span>
-      </div>
+      <h2 class="card-title-styled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Status Tata Tertib &amp; Pembinaan
+      </h2>
     </div>
     <div class="card-body-styled">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
         <div>
           <span style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Akumulasi Poin Terdata:</span>
-          <div style="font-size: 24px; font-weight: 700; line-height: 1.2; margin-top: 2px; color: <?= $points >= 50 ? 'var(--color-danger)' : ($points >= 20 ? 'var(--color-warning)' : 'var(--color-primary)') ?>;">
-            <?= $points ?> <span style="font-size: 12.5px; font-weight: 500; color: var(--color-text-muted);">/ Batas Toleransi 100 Poin</span>
+          <div style="font-size: 26px; font-weight: 700; line-height: 1.2; margin-top: 2px; color: <?= $points >= 50 ? 'var(--color-danger)' : ($points >= 20 ? 'var(--color-warning)' : 'var(--color-primary)') ?>;">
+            <?= $points ?> <span style="font-size: 13px; font-weight: 500; color: var(--color-text-muted);">/ Batas Maksimal 100 Poin</span>
           </div>
         </div>
         <div>
-          <span class="badge" style="background-color: <?= $points >= 50 ? '#FEE2E2' : ($points >= 20 ? '#FEF3C7' : '#EBF6F0') ?>; color: <?= $points >= 50 ? '#991B1B' : ($points >= 20 ? '#92400E' : '#166534') ?>; font-size: 11.5px; font-weight: 600; padding: 4px 10px;">
+          <span class="badge" style="background-color: <?= $points >= 50 ? '#FEE2E2' : ($points >= 20 ? '#FEF3C7' : '#EBF6F0') ?>; color: <?= $points >= 50 ? '#991B1B' : ($points >= 20 ? '#92400E' : '#166534') ?>; font-size: 12px; font-weight: 600; padding: 4px 10px;">
             <?= e($sanction['nama_sanksi']) ?>
           </span>
         </div>
       </div>
 
-      <div style="background-color: #F8FAFC; border: 1px solid var(--color-border); padding: 11px 13px; border-radius: var(--radius-sm); margin-bottom: 8px;">
-        <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 3px;">Tindakan Bimbingan Sekolah:</div>
-        <div style="font-size: 12px; color: var(--color-text-main); line-height: 1.45;"><?= e($sanction['tindakan']) ?></div>
+      <div style="background-color: #F8FAFC; border: 1px solid var(--color-border); padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 10px;">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 4px;">Tindakan Bimbingan Sekolah:</div>
+        <div style="font-size: 12.5px; color: var(--color-text-main); line-height: 1.5;"><?= e($sanction['tindakan']) ?></div>
       </div>
 
-      <div style="font-size: 11px; color: var(--color-text-muted); line-height: 1.45;">
+      <div style="font-size: 11.5px; color: var(--color-text-muted); line-height: 1.5;">
         <em>Pencatatan poin kedisiplinan ditujukan untuk pembinaan karakter terpadu antara pihak sekolah dan orang tua/wali siswa.</em>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Violation Records Data Sheet for this Child -->
-<div class="data-sheet">
-  <div class="admin-toolbar">
+<!-- Violation Records Table for this Child -->
+<div class="surface-card">
+  <div class="card-header-styled">
     <div>
-      <span style="font-size: 13px; font-weight: 600; color: var(--color-primary);">Buku Catatan Kedisiplinan Siswa</span>
-    </div>
-    <div class="admin-toolbar-meta">
-      Total <strong><?= count($violations) ?></strong> insiden tercatat
+      <h2 class="card-title-styled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Riwayat Catatan Pelanggaran Kedisiplinan
+      </h2>
+      <span class="card-subtitle-styled">Rincian seluruh insiden yang tercatat oleh dewan guru</span>
     </div>
   </div>
-  <div class="table-responsive">
-    <table class="app-table">
+  <div class="card-body-styled" style="padding: 0;">
+    <div class="table-responsive">
+      <table class="app-table">
         <thead>
           <tr>
             <th>Tanggal Kejadian</th>

@@ -142,19 +142,25 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Two Charts Section (Open Layout: Kategori Pelanggaran & Tren Bulanan) -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; margin-bottom: 24px;">
+<!-- Two Charts Section (Horizontal Bar Chart & Line Chart) -->
+<div class="dashboard-charts-grid">
   <!-- Horizontal Bar Chart: Kategori Pelanggaran Terbanyak -->
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
       <div>
-        <h2 class="card-title-styled">Kategori Pelanggaran Terbanyak</h2>
+        <h2 class="card-title-styled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Kategori Pelanggaran Terbanyak
+        </h2>
         <span class="card-subtitle-styled">Distribusi insiden berdasarkan frekuensi jenis pelanggaran</span>
       </div>
     </div>
     <div class="card-body-styled">
       <?php if (empty($top_categories)): ?>
         <div class="empty-state-box">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
           <p>Belum ada data pelanggaran pada periode ini.</p>
         </div>
       <?php else: ?>
@@ -187,8 +193,11 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="surface-card" style="margin-bottom: 0;">
     <div class="card-header-styled">
       <div>
-        <h2 class="card-title-styled">Tren Pelanggaran Bulanan</h2>
-        <span class="card-subtitle-styled">Fluktuasi kejadian pelanggaran sepanjang tahun ajaran</span>
+        <h2 class="card-title-styled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Tren Pelanggaran Bulanan
+        </h2>
+        <span class="card-subtitle-styled">Fluktuasi kejadian pelanggaran sepanjang waktu</span>
       </div>
       <?php if (!empty($trend_rows) && count($trend_rows) >= 2): ?>
         <span class="trend-mom-pill <?= $latest_diff > 0 ? 'up' : ($latest_diff < 0 ? 'down' : 'neutral') ?>">
@@ -199,6 +208,9 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="card-body-styled">
       <?php if (empty($trend_rows)): ?>
         <div class="empty-state-box">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
           <p>Belum ada data tren kejadian pada periode ini.</p>
         </div>
       <?php else: ?>
@@ -211,18 +223,22 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <!-- Lower Section: Top 5 Highest Points & Recent Activities -->
-<div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px;">
+<div class="dashboard-bottom-grid">
   <!-- Top 5 Highest Points Students -->
   <div class="surface-card">
     <div class="card-header-styled">
       <div>
-        <h2 class="card-title-styled">Siswa Butuh Pembinaan</h2>
-        <span class="card-subtitle-styled">Akumulasi poin kedisiplinan tertinggi</span>
+        <h2 class="card-title-styled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          Siswa Poin Tertinggi
+        </h2>
+        <span class="card-subtitle-styled">Perlu perhatian & bimbingan khusus</span>
       </div>
-      <a href="<?= BASE_URL ?>/admin/students.php" class="btn btn-secondary btn-sm">Daftar Lengkap</a>
+      <a href="<?= BASE_URL ?>/admin/students.php" class="btn btn-secondary btn-sm">Lihat Semua</a>
     </div>
     <div class="card-body-styled" style="padding: 0;">
-      <table class="app-table">
+      <div class="table-responsive">
+        <table class="app-table">
         <thead>
           <tr>
             <th>Siswa / Kelas</th>
@@ -260,6 +276,7 @@ require_once __DIR__ . '/../includes/header.php';
           <?php endif; ?>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 
@@ -267,17 +284,20 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="surface-card">
     <div class="card-header-styled">
       <div>
-        <h2 class="card-title-styled">Aktivitas Pencatatan Terkini</h2>
+        <h2 class="card-title-styled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Aktivitas Pencatatan Terkini
+        </h2>
         <span class="card-subtitle-styled">Pencatatan pelanggaran paling baru oleh guru</span>
       </div>
-      <a href="<?= BASE_URL ?>/admin/violations.php" class="btn btn-secondary btn-sm">Buka Buku Catatan</a>
+      <a href="<?= BASE_URL ?>/admin/violations.php" class="btn btn-secondary btn-sm">Buka Riwayat</a>
     </div>
     <div class="card-body-styled" style="padding: 0;">
       <div class="table-responsive">
         <table class="app-table">
           <thead>
             <tr>
-              <th>Waktu Kejadian</th>
+              <th>Tanggal Kejadian</th>
               <th>Siswa &amp; Kelas</th>
               <th>Bentuk Pelanggaran</th>
               <th style="text-align: center;">Poin</th>

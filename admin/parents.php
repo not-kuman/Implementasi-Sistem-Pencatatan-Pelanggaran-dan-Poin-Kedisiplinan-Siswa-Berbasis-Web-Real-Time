@@ -153,93 +153,98 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Parents Data Sheet with Integrated Toolbar -->
-<div class="data-sheet">
-  <div class="admin-toolbar">
-    <form method="GET" action="<?= BASE_URL ?>/admin/parents.php" class="admin-toolbar-form">
-      <div class="admin-search-wrap">
-        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama wali, anak, atau NIS..." value="<?= e($search) ?>">
+<div class="surface-card" style="margin-bottom: 20px;">
+  <div class="card-body-styled" style="padding: 16px 20px;">
+    <form method="GET" action="<?= BASE_URL ?>/admin/parents.php" style="display: flex; gap: 12px; align-items: center;">
+      <div style="flex: 1;">
+        <input type="text" name="search" class="form-control" placeholder="Cari nama wali, nama siswa, atau NIS..." value="<?= e($search) ?>">
       </div>
-      <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
+      <button type="submit" class="btn btn-primary">Cari</button>
       <?php if (!empty($search)): ?>
-        <a href="<?= BASE_URL ?>/admin/parents.php" class="btn btn-secondary btn-sm">Reset</a>
+        <a href="<?= BASE_URL ?>/admin/parents.php" class="btn btn-secondary">Reset</a>
       <?php endif; ?>
     </form>
-    <div class="admin-toolbar-meta">
-      Total <strong><?= count($parents) ?></strong> wali siswa terhubung
+  </div>
+</div>
+
+<div class="surface-card">
+  <div class="card-header-styled">
+    <div>
+      <h2 class="card-title-styled">Daftar Wali Siswa Terdaftar</h2>
+      <span class="card-subtitle-styled">Total <?= count($parents) ?> wali siswa terhubung</span>
     </div>
   </div>
-
-  <div class="table-responsive">
-    <table class="app-table">
-      <thead>
-        <tr>
-          <th>Nama Wali</th>
-          <th>Hubungan</th>
-          <th>Peserta Didik (Anak)</th>
-          <th>Kelas</th>
-          <th>No WhatsApp</th>
-          <th>Pekerjaan</th>
-          <th>Akun Portal</th>
-          <th style="text-align: right;">Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (empty($parents)): ?>
+  <div class="card-body-styled" style="padding: 0;">
+    <div class="table-responsive">
+      <table class="app-table">
+        <thead>
           <tr>
-            <td colspan="8">
-              <div class="empty-state">
-                <div class="empty-state-title">Belum ada data wali siswa</div>
-                <div class="empty-state-text">Silakan tautkan data wali siswa baru.</div>
-              </div>
-            </td>
+            <th>Nama Wali</th>
+            <th>Hubungan</th>
+            <th>Peserta Didik (Anak)</th>
+            <th>Kelas</th>
+            <th>No WhatsApp</th>
+            <th>Pekerjaan</th>
+            <th>Akun Portal</th>
+            <th style="text-align: right;">Aksi</th>
           </tr>
-        <?php else: ?>
-          <?php foreach ($parents as $p): ?>
+        </thead>
+        <tbody>
+          <?php if (empty($parents)): ?>
             <tr>
-              <td>
-                <div style="font-weight: 600; color: var(--color-primary);"><?= e($p['nama_wali']) ?></div>
-                <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($p['alamat'] ?: '-') ?></div>
-              </td>
-              <td>
-                <span class="badge" style="background-color: #F1F5F9; color: var(--color-text-main);"><?= e($p['hubungan']) ?></span>
-              </td>
-              <td>
-                <div style="font-weight: 600;"><?= e($p['nama_siswa']) ?></div>
-                <div style="font-size: 11px; font-family: var(--font-mono); color: var(--color-text-muted);">NIS: <?= e($p['nis']) ?></div>
-              </td>
-              <td>
-                <span style="font-weight: 600; color: var(--color-accent-dark);"><?= e($p['nama_kelas']) ?></span>
-              </td>
-              <td>
-                <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 600;"><?= e($p['no_telp']) ?></span>
-              </td>
-              <td>
-                <span style="font-size: 12.5px;"><?= e($p['pekerjaan'] ?: '-') ?></span>
-              </td>
-              <td>
-                <?php if ($p['username']): ?>
-                  <span class="badge" style="background-color: #EBF4F3; color: var(--color-accent-dark); font-family: var(--font-mono);">
-                    @<?= e($p['username']) ?>
-                  </span>
-                <?php else: ?>
-                  <span style="font-size: 11px; color: var(--color-text-subtle);">Belum ada akun</span>
-                <?php endif; ?>
-              </td>
-              <td style="text-align: right; white-space: nowrap;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick='editParent(<?= json_encode($p) ?>)' title="Ubah Data">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="deleteParent(<?= (int)$p['id'] ?>, '<?= e(addslashes($p['nama_wali'])) ?>')" style="color: var(--color-danger);" title="Hapus">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
+              <td colspan="8">
+                <div class="empty-state">
+                  <div class="empty-state-title">Belum ada data wali siswa</div>
+                  <div class="empty-state-text">Silakan tautkan data wali siswa baru.</div>
+                </div>
               </td>
             </tr>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </tbody>
-    </table>
+          <?php else: ?>
+            <?php foreach ($parents as $p): ?>
+              <tr>
+                <td>
+                  <div style="font-weight: 600; color: var(--color-primary);"><?= e($p['nama_wali']) ?></div>
+                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($p['alamat'] ?: '-') ?></div>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: #F1F5F9; color: var(--color-text-main);"><?= e($p['hubungan']) ?></span>
+                </td>
+                <td>
+                  <div style="font-weight: 600;"><?= e($p['nama_siswa']) ?></div>
+                  <div style="font-size: 11px; font-family: var(--font-mono); color: var(--color-text-muted);">NIS: <?= e($p['nis']) ?></div>
+                </td>
+                <td>
+                  <span style="font-weight: 600; color: var(--color-accent-dark);"><?= e($p['nama_kelas']) ?></span>
+                </td>
+                <td>
+                  <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 600;"><?= e($p['no_telp']) ?></span>
+                </td>
+                <td>
+                  <span style="font-size: 12.5px;"><?= e($p['pekerjaan'] ?: '-') ?></span>
+                </td>
+                <td>
+                  <?php if ($p['username']): ?>
+                    <span class="badge" style="background-color: #EBF4F3; color: var(--color-accent-dark); font-family: var(--font-mono);">
+                      @<?= e($p['username']) ?>
+                    </span>
+                  <?php else: ?>
+                    <span style="font-size: 11px; color: var(--color-text-subtle);">Belum ada akun</span>
+                  <?php endif; ?>
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick='editParent(<?= json_encode($p) ?>)' title="Ubah Data">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteParent(<?= (int)$p['id'] ?>, '<?= e(addslashes($p['nama_wali'])) ?>')" style="color: var(--color-danger);" title="Hapus">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

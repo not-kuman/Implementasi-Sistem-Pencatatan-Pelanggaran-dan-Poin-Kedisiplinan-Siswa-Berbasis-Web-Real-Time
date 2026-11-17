@@ -1,6 +1,6 @@
 <?php
 /**
- * SIM Kedisiplinan Siswa - SMA Kartika 1-2 Medan
+ * SIM Kedisiplinan Siswa
  * Authentication Page (Login)
  */
 
@@ -81,138 +81,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masuk Sistem &bull; <?= e(SCHOOL_NAME) ?></title>
+  <title>Masuk Sistem &bull; <?= e(APP_NAME) ?></title>
   
   <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/images/logo.svg">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/auth.css">
 </head>
-<body class="auth-body">
+<body class="login-page">
 
-<div class="auth-container">
-  <!-- Left Side: Form Autentikasi Vertikal -->
-  <div class="auth-form-side">
-    <div>
-      <div class="auth-brand">
-        <img src="<?= BASE_URL ?>/assets/images/logo.svg" alt="Logo Sistem Informasi Kedisiplinan Siswa" class="auth-brand-logo">
-        <div class="auth-brand-info">
-          <span class="auth-brand-school"><?= e(APP_NAME) ?></span>
-          <span class="auth-brand-system"><?= e(APP_SUBTITLE) ?></span>
+<div class="login-wrapper">
+  <!-- Header Identitas Aplikasi -->
+  <header class="login-header">
+    <div class="login-logo-wrap">
+      <img src="<?= BASE_URL ?>/assets/images/logo.svg" alt="Logo Sistem Informasi Kedisiplinan" class="login-logo">
+    </div>
+    <h1 class="login-title">Sistem Informasi Kedisiplinan Siswa</h1>
+    <div class="login-subtitle">Pencatatan Pelanggaran dan Poin Kedisiplinan</div>
+    <p class="login-desc">Portal manajemen tata tertib, pembinaan karakter, dan pemantauan poin kedisiplinan peserta didik.</p>
+  </header>
+
+  <!-- Card Formulir Login -->
+  <div class="login-card">
+    <div class="login-card-header">
+      <h2 class="login-card-title">Masuk ke Portal</h2>
+      <span class="login-card-badge">Autentikasi Terpadu</span>
+    </div>
+
+    <?php if (!$db_configured): ?>
+      <div class="login-alert login-alert-error" style="background-color: #FFFBEB; border-color: #FCD34D; color: #92400E;">
+        <svg class="login-alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <div class="login-alert-text">
+          <strong>Database Cloud Belum Terhubung:</strong> Variabel <code>DB_HOST</code> belum diisi di dashboard hosting.
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($error_message)): ?>
+      <div class="login-alert login-alert-error" role="alert">
+        <svg class="login-alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div class="login-alert-text"><?= e($error_message) ?></div>
+      </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['logged_out'])): ?>
+      <div class="login-alert login-alert-success" role="alert">
+        <svg class="login-alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <div class="login-alert-text">Anda telah berhasil keluar dari sistem dengan aman.</div>
+      </div>
+    <?php endif; ?>
+
+    <form action="<?= BASE_URL ?>/login.php" method="POST" autocomplete="off" class="login-form">
+      <?= csrf_field() ?>
+
+      <div class="login-field-group">
+        <label for="username" class="login-label">
+          <span>Nama Pengguna (Username)</span>
+          <span class="login-label-req">*</span>
+        </label>
+        <div class="login-input-wrap">
+          <span class="login-input-prefix">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </span>
+          <input type="text" id="username" name="username" class="login-input" placeholder="Masukkan username" required autofocus value="<?= e($_POST['username'] ?? '') ?>">
         </div>
       </div>
 
-      <div class="auth-heading">
-        <h1 class="auth-title">Masuk ke Portal</h1>
-        <p class="auth-desc">Gunakan kredensial akun terdaftar Anda untuk melanjutkan.</p>
-      </div>
-
-      <?php if (!$db_configured): ?>
-        <div class="auth-alert-error" style="background-color: #FFFBEB; border-color: #FCD34D; color: #92400E; margin-bottom: 20px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          <div style="font-size: 11.5px; line-height: 1.5;">
-            <strong>Database MySQL Belum Dikonfigurasi di Vercel:</strong><br>
-            Aplikasi mendeteksi <code>DB_HOST</code> masih kosong / localhost. Silakan buka <strong>Project Settings &gt; Environment Variables</strong> di Vercel Dashboard, masukkan variabel database (Host, Port, User, Pass, Name), lalu lakukan <strong>Redeploy</strong>.
-          </div>
-        </div>
-      <?php endif; ?>
-
-      <?php if (!empty($error_message)): ?>
-        <div class="auth-alert-error">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span><?= e($error_message) ?></span>
-        </div>
-      <?php endif; ?>
-
-      <?php if (isset($_GET['logged_out'])): ?>
-        <div class="auth-alert-success">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Anda telah berhasil keluar dari sistem dengan aman.</span>
-        </div>
-      <?php endif; ?>
-
-      <form action="<?= BASE_URL ?>/login.php" method="POST" autocomplete="off">
-        <?= csrf_field() ?>
-
-        <div class="form-group">
-          <label for="username" class="form-label">Nama Pengguna (Username)</label>
-          <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" required autofocus value="<?= e($_POST['username'] ?? '') ?>">
-        </div>
-
-        <div class="form-group">
-          <label for="password" class="form-label">Kata Sandi (Password)</label>
-          <div class="password-input-group">
-            <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan kata sandi" required>
-            <button type="button" class="password-toggle-btn" id="toggle-pw-btn" aria-label="Tampilkan / Sembunyikan Sandi">
-              <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-login-submit">
-          <span>Masuk Sistem</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-          </svg>
-        </button>
-      </form>
-    </div>
-
-    <div class="auth-footer-text">
-      &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA. All Rights Reserved.
-    </div>
-  </div>
-
-  <!-- Right Side: Informasi Fungsional Sistem & Kredibilitas Administratif -->
-  <div class="auth-info-side">
-    <div class="system-info-panel">
-      <div class="info-kicker">PORTAL ADMINISTRASI RESMI</div>
-      <h2 class="info-title"><?= e(APP_NAME) ?></h2>
-      <p class="info-description">
-        Sistem manajemen dan pembinaan tata tertib terpusat untuk memantau rekam jejak kedisiplinan serta akumulasi poin pelanggaran peserta didik secara transparan dan akuntabel.
-      </p>
-
-      <div class="info-feature-list">
-        <div class="info-feature-item">
-          <div class="feature-bullet"></div>
-          <div>
-            <strong>Pencatatan Insiden Terintegrasi</strong>
-            <span>Pencatatan pelanggaran real-time dengan validasi data dan kalkulasi poin terverifikasi.</span>
-          </div>
-        </div>
-
-        <div class="info-feature-item">
-          <div class="feature-bullet"></div>
-          <div>
-            <strong>Klasifikasi & Sanksi Bertingkat</strong>
-            <span>Hierarki kategori administratif (Ringan, Sedang, Berat) sesuai regulasi sekolah.</span>
-          </div>
-        </div>
-
-        <div class="info-feature-item">
-          <div class="feature-bullet"></div>
-          <div>
-            <strong>Komunikasi Terpadu ke Wali Siswa</strong>
-            <span>Transmisi ringkasan informasi kedisiplinan guna sinergi pembinaan orang tua dan sekolah.</span>
-          </div>
+      <div class="login-field-group">
+        <label for="password" class="login-label">
+          <span>Kata Sandi (Password)</span>
+          <span class="login-label-req">*</span>
+        </label>
+        <div class="login-input-wrap">
+          <span class="login-input-prefix">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <input type="password" id="password" name="password" class="login-input login-input-password" placeholder="Masukkan kata sandi" required>
+          <button type="button" class="login-password-toggle" id="toggle-pw-btn" aria-label="Tampilkan / Sembunyikan Kata Sandi">
+            <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
         </div>
       </div>
-    </div>
 
-    <div class="info-security-notice">
-      <svg class="info-security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button type="submit" class="login-btn-submit" id="btn-login">
+        <span>Masuk ke Sistem</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </form>
+
+    <div class="login-roles-info">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
-      <span>Akses terbatas untuk Administrator, Guru / Tim BK, dan Wali Siswa terdaftar.</span>
+      <span>Hak akses tersedia untuk <strong>Administrator</strong>, <strong>Guru / BK</strong>, dan <strong>Wali Siswa</strong>.</span>
     </div>
   </div>
+
+  <!-- Copyright Anggota Kelompok -->
+  <footer class="login-footer">
+    <div class="login-copyright">
+      &copy; 2026 &mdash; Copyright by ARSYAD SADEWA, BAGAS PRASETYO, NIKEN AYU RESDIANA.
+    </div>
+  </footer>
 </div>
 
 <script>

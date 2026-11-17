@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/header.php';
 <form action="<?= BASE_URL ?>/admin/settings.php" method="POST">
   <?= csrf_field() ?>
 
-  <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+  <div class="grid-form-layout">
     <!-- Left Column: School Profile & Coordinates -->
     <div>
       <div class="surface-card">

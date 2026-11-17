@@ -196,130 +196,145 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Students Data Sheet with Integrated Toolbar -->
-<div class="data-sheet">
-  <div class="admin-toolbar">
-    <form method="GET" action="<?= BASE_URL ?>/admin/students.php" class="admin-toolbar-form">
-      <div class="admin-search-wrap">
-        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" name="search" class="admin-search-input" placeholder="Cari nama atau NIS siswa..." value="<?= e($filter_search) ?>">
+<!-- Filters Bar -->
+<div class="surface-card" style="margin-bottom: 20px;">
+  <div class="card-body-styled" style="padding: 16px 20px;">
+    <form method="GET" action="<?= BASE_URL ?>/admin/students.php" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;">
+      <div style="flex: 1; min-width: 220px;">
+        <label class="form-label" style="margin-bottom: 4px;">Pencarian Siswa</label>
+        <input type="text" name="search" class="form-control" placeholder="Ketik nama atau NIS..." value="<?= e($filter_search) ?>">
       </div>
 
-      <select name="class_id" class="admin-filter-select">
-        <option value="0">Semua Rombel</option>
-        <?php foreach ($classes_list as $cls): ?>
-          <option value="<?= $cls['id'] ?>" <?= $filter_class == $cls['id'] ? 'selected' : '' ?>>
-            <?= e($cls['nama_kelas']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+      <div style="width: 200px;">
+        <label class="form-label" style="margin-bottom: 4px;">Filter Kelas</label>
+        <select name="class_id" class="form-control">
+          <option value="0">Semua Kelas</option>
+          <?php foreach ($classes_list as $cls): ?>
+            <option value="<?= $cls['id'] ?>" <?= $filter_class == $cls['id'] ? 'selected' : '' ?>>
+              <?= e($cls['nama_kelas']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
 
-      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
-      <?php if (!empty($filter_search) || $filter_class > 0): ?>
-        <a href="<?= BASE_URL ?>/admin/students.php" class="btn btn-secondary btn-sm">Reset</a>
-      <?php endif; ?>
+      <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn btn-primary" style="height: 38px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Cari</span>
+        </button>
+        <?php if (!empty($filter_search) || $filter_class > 0): ?>
+          <a href="<?= BASE_URL ?>/admin/students.php" class="btn btn-secondary" style="height: 38px;">Reset</a>
+        <?php endif; ?>
+      </div>
     </form>
+  </div>
+</div>
 
-    <div class="admin-toolbar-meta">
-      Total <strong><?= $total_rows ?></strong> peserta didik terdaftar
+<!-- Students Data Table -->
+<div class="surface-card">
+  <div class="card-header-styled">
+    <div>
+      <h2 class="card-title-styled">Daftar Peserta Didik</h2>
+      <span class="card-subtitle-styled">Menampilkan <?= count($students) ?> dari total <?= $total_rows ?> siswa</span>
     </div>
   </div>
-
-  <div class="table-responsive">
-    <table class="app-table">
-      <thead>
-        <tr>
-          <th>NIS / NISN</th>
-          <th>Nama Lengkap</th>
-          <th>JK</th>
-          <th>Kelas</th>
-          <th>No Telepon Wali</th>
-          <th style="text-align: center;">Akumulasi Poin</th>
-          <th>Status Sanksi</th>
-          <th style="text-align: right;">Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (empty($students)): ?>
+  <div class="card-body-styled" style="padding: 0;">
+    <div class="table-responsive">
+      <table class="app-table">
+        <thead>
           <tr>
-            <td colspan="8">
-              <div class="empty-state">
-                <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>
-                </svg>
-                <div class="empty-state-title">Tidak ada data siswa ditemukan</div>
-                <div class="empty-state-text">Silakan sesuaikan kata kunci pencarian atau tambah siswa baru.</div>
-              </div>
-            </td>
+            <th>NIS / NISN</th>
+            <th>Nama Lengkap</th>
+            <th>JK</th>
+            <th>Kelas</th>
+            <th>No Telepon Wali</th>
+            <th style="text-align: center;">Akumulasi Poin</th>
+            <th>Status Sanksi</th>
+            <th style="text-align: right;">Aksi</th>
           </tr>
-        <?php else: ?>
-          <?php foreach ($students as $s): 
-            $sanction = get_sanction_by_points($s['total_poin']);
-            $badge_pts = ($s['total_poin'] >= 50) ? 'badge-points danger' : (($s['total_poin'] >= 20) ? 'badge-points warning' : 'badge-points safe');
-          ?>
+        </thead>
+        <tbody>
+          <?php if (empty($students)): ?>
             <tr>
-              <td>
-                <div style="font-family: var(--font-mono); font-weight: 600; color: var(--color-primary);"><?= e($s['nis']) ?></div>
-                <div style="font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono);"><?= e($s['nisn'] ?: '-') ?></div>
-              </td>
-              <td>
-                <div style="font-weight: 600; color: var(--color-primary);"><?= e($s['nama_lengkap']) ?></div>
-                <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($s['tempat_lahir'] ? $s['tempat_lahir'] . ', ' . format_date_id($s['tanggal_lahir']) : '-') ?></div>
-              </td>
-              <td>
-                <span class="badge" style="background-color: #F1F5F9; color: var(--color-text-main);">
-                  <?= $s['jenis_kelamin'] === 'L' ? 'L' : 'P' ?>
-                </span>
-              </td>
-              <td>
-                <span style="font-weight: 600; color: var(--color-accent-dark);"><?= e($s['nama_kelas']) ?></span>
-              </td>
-              <td>
-                <div style="font-family: var(--font-mono); font-size: 12px;"><?= e($s['no_telp_wali']) ?></div>
-                <?php if (!empty($s['nama_wali'])): ?>
-                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($s['nama_wali']) ?> (<?= e($s['hubungan']) ?>)</div>
-                <?php endif; ?>
-              </td>
-              <td style="text-align: center;">
-                <span class="<?= $badge_pts ?>"><?= (int)$s['total_poin'] ?></span>
-              </td>
-              <td>
-                <span style="font-size: 12px; font-weight: 600; color: #334155;">
-                  <?= e($sanction['nama_sanksi']) ?>
-                </span>
-              </td>
-              <td style="text-align: right; white-space: nowrap;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="viewStudentDetails(<?= (int)$s['id'] ?>)" title="Lihat Profil & Riwayat">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick='editStudent(<?= json_encode($s) ?>)' title="Ubah Data Siswa">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="deleteStudent(<?= (int)$s['id'] ?>, '<?= e(addslashes($s['nama_lengkap'])) ?>')" title="Hapus Siswa" style="color: var(--color-danger);">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
+              <td colspan="8">
+                <div class="empty-state">
+                  <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                  <div class="empty-state-title">Tidak ada data siswa ditemukan</div>
+                  <div class="empty-state-text">Silakan sesuaikan kata kunci pencarian atau tambah siswa baru.</div>
+                </div>
               </td>
             </tr>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <?php if ($total_pages > 1): ?>
-    <div class="pagination-wrapper" style="padding: 14px 20px;">
-      <span class="pagination-info">Halaman <?= $page ?> dari <?= $total_pages ?></span>
-      <div class="pagination-links">
-        <?php for ($p = 1; $p <= $total_pages; $p++): ?>
-          <a href="<?= BASE_URL ?>/admin/students.php?page=<?= $p ?>&search=<?= urlencode($filter_search) ?>&class_id=<?= $filter_class ?>" 
-             class="page-btn <?= $p === $page ? 'active' : '' ?>">
-            <?= $p ?>
-          </a>
-        <?php endfor; ?>
-      </div>
+          <?php else: ?>
+            <?php foreach ($students as $s): 
+              $sanction = get_sanction_by_points($s['total_poin']);
+              $badge_pts = ($s['total_poin'] >= 50) ? 'badge-points danger' : (($s['total_poin'] >= 20) ? 'badge-points warning' : 'badge-points safe');
+            ?>
+              <tr>
+                <td>
+                  <div style="font-family: var(--font-mono); font-weight: 600; color: var(--color-primary);"><?= e($s['nis']) ?></div>
+                  <div style="font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono);"><?= e($s['nisn'] ?: '-') ?></div>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--color-primary);"><?= e($s['nama_lengkap']) ?></div>
+                  <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($s['tempat_lahir'] ? $s['tempat_lahir'] . ', ' . format_date_id($s['tanggal_lahir']) : '-') ?></div>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: #F1F5F9; color: var(--color-text-main);">
+                    <?= $s['jenis_kelamin'] === 'L' ? 'L' : 'P' ?>
+                  </span>
+                </td>
+                <td>
+                  <span style="font-weight: 600; color: var(--color-accent-dark);"><?= e($s['nama_kelas']) ?></span>
+                </td>
+                <td>
+                  <div style="font-family: var(--font-mono); font-size: 12px;"><?= e($s['no_telp_wali']) ?></div>
+                  <?php if (!empty($s['nama_wali'])): ?>
+                    <div style="font-size: 11px; color: var(--color-text-muted);"><?= e($s['nama_wali']) ?> (<?= e($s['hubungan']) ?>)</div>
+                  <?php endif; ?>
+                </td>
+                <td style="text-align: center;">
+                  <span class="<?= $badge_pts ?>"><?= (int)$s['total_poin'] ?></span>
+                </td>
+                <td>
+                  <span style="font-size: 12px; font-weight: 600; color: #334155;">
+                    <?= e($sanction['nama_sanksi']) ?>
+                  </span>
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="viewStudentDetails(<?= (int)$s['id'] ?>)" title="Lihat Profil & Riwayat">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick='editStudent(<?= json_encode($s) ?>)' title="Ubah Data Siswa">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="deleteStudent(<?= (int)$s['id'] ?>, '<?= e(addslashes($s['nama_lengkap'])) ?>')" title="Hapus Siswa" style="color: var(--color-danger);">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
     </div>
-  <?php endif; ?>
+
+    <!-- Pagination -->
+    <?php if ($total_pages > 1): ?>
+      <div class="pagination-wrapper" style="padding: 16px 20px;">
+        <span class="pagination-info">Halaman <?= $page ?> dari <?= $total_pages ?></span>
+        <div class="pagination-links">
+          <?php for ($p = 1; $p <= $total_pages; $p++): ?>
+            <a href="<?= BASE_URL ?>/admin/students.php?page=<?= $p ?>&search=<?= urlencode($filter_search) ?>&class_id=<?= $filter_class ?>" 
+               class="page-btn <?= $p === $page ? 'active' : '' ?>">
+              <?= $p ?>
+            </a>
+          <?php endfor; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+  </div>
 </div>
 
 <!-- Modal Tambah / Edit Siswa -->

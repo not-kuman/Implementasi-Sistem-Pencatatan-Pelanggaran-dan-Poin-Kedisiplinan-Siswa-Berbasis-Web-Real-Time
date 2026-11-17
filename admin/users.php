@@ -137,32 +137,42 @@ require_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Users Data Sheet with Integrated Toolbar -->
-<div class="data-sheet">
-  <div class="admin-toolbar">
-    <form method="GET" action="<?= BASE_URL ?>/admin/users.php" class="admin-toolbar-form">
-      <div class="admin-search-wrap">
-        <svg class="admin-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" name="search" class="admin-search-input" placeholder="Cari username atau nama..." value="<?= e($search) ?>">
+<div class="surface-card" style="margin-bottom: 20px;">
+  <div class="card-body-styled" style="padding: 16px 20px;">
+    <form method="GET" action="<?= BASE_URL ?>/admin/users.php" style="display: flex; gap: 14px; align-items: flex-end;">
+      <div style="flex: 1;">
+        <label class="form-label" style="margin-bottom: 4px;">Pencarian Pengguna</label>
+        <input type="text" name="search" class="form-control" placeholder="Cari nama pengguna atau nama lengkap..." value="<?= e($search) ?>">
       </div>
-      <select name="role" class="admin-filter-select">
-        <option value="">Semua Peran (Role)</option>
-        <option value="admin" <?= $role_filter === 'admin' ? 'selected' : '' ?>>Administrator</option>
-        <option value="teacher" <?= $role_filter === 'teacher' ? 'selected' : '' ?>>Guru / BK</option>
-        <option value="parent" <?= $role_filter === 'parent' ? 'selected' : '' ?>>Wali Siswa</option>
-      </select>
-      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
-      <?php if (!empty($search) || !empty($role_filter)): ?>
-        <a href="<?= BASE_URL ?>/admin/users.php" class="btn btn-secondary btn-sm">Reset</a>
-      <?php endif; ?>
+      <div style="width: 200px;">
+        <label class="form-label" style="margin-bottom: 4px;">Role Pengguna</label>
+        <select name="role" class="form-control">
+          <option value="">Semua Peran (Role)</option>
+          <option value="admin" <?= $role_filter === 'admin' ? 'selected' : '' ?>>Administrator</option>
+          <option value="teacher" <?= $role_filter === 'teacher' ? 'selected' : '' ?>>Guru / BK</option>
+          <option value="parent" <?= $role_filter === 'parent' ? 'selected' : '' ?>>Wali Siswa</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn btn-primary" style="height: 38px;">Filter</button>
+        <?php if (!empty($search) || !empty($role_filter)): ?>
+          <a href="<?= BASE_URL ?>/admin/users.php" class="btn btn-secondary" style="height: 38px;">Reset</a>
+        <?php endif; ?>
+      </div>
     </form>
-    <div class="admin-toolbar-meta">
-      Total <strong><?= count($users) ?></strong> akun terdaftar
+  </div>
+</div>
+
+<div class="surface-card">
+  <div class="card-header-styled">
+    <div>
+      <h2 class="card-title-styled">Daftar Akun Pengguna</h2>
+      <span class="card-subtitle-styled">Total <?= count($users) ?> akun terdaftar pada sistem</span>
     </div>
   </div>
-
-  <div class="table-responsive">
-    <table class="app-table">
+  <div class="card-body-styled" style="padding: 0;">
+    <div class="table-responsive">
+      <table class="app-table">
         <thead>
           <tr>
             <th>Username</th>
