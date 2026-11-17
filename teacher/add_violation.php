@@ -33,15 +33,24 @@ foreach ($all_categories as $c) {
 // Fetch active sanctions for preview
 $sanctions = $pdo->query("SELECT * FROM sanctions ORDER BY poin_min ASC")->fetchAll();
 
-// Fetch active students for instant lookup and datalist fallback
+// Fetch active students grouped by class for dropdown selection
 $stmtStudents = $pdo->query("
     SELECT s.id, s.nis, s.nama_lengkap, s.jenis_kelamin, s.total_poin, s.no_telp_wali, c.nama_kelas
     FROM students s
     JOIN classes c ON s.class_id = c.id
     WHERE s.status_siswa = 'aktif'
-    ORDER BY s.nama_lengkap ASC
+    ORDER BY c.nama_kelas ASC, s.nama_lengkap ASC
 ");
 $all_active_students = $stmtStudents->fetchAll();
+
+$students_by_class = [];
+foreach ($all_active_students as $st) {
+    $className = $st['nama_kelas'];
+    if (!isset($students_by_class[$className])) {
+        $students_by_class[$className] = [];
+    }
+    $students_by_class[$className][] = $st;
+}
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -67,23 +76,31 @@ require_once __DIR__ . '/../includes/header.php';
         <form id="violation-form" autocomplete="off">
           <?= csrf_field() ?>
           <input type="hidden" name="teacher_id" value="<?= $teacher_id ?>">
-          <input type="hidden" name="student_id" id="selected_student_id" value="">
 
           <!-- LANGKAH 1: Pencarian & Pemilihan Siswa -->
           <div class="form-group">
             <label class="form-label">
               1. Cari & Pilih Peserta Didik <span class="required">*</span>
             </label>
-            <div class="autocomplete-wrapper">
-              <input type="text" id="student-search-input" list="student-datalist" class="form-control" placeholder="Ketik nama lengkap atau NIS siswa (minimal 2 huruf)...">
-              <datalist id="student-datalist">
-                <?php foreach ($all_active_students as $st): ?>
-                  <option value="<?= e($st['nama_lengkap']) ?>"><?= e($st['nis']) ?> - <?= e($st['nama_kelas']) ?></option>
-                <?php endforeach; ?>
-              </datalist>
-              <div class="autocomplete-dropdown" id="student-dropdown"></div>
-            </div>
-            <small style="font-size: 11px; color: var(--color-text-muted);">Sistem akan mencari secara seketika dari pangkalan data siswa aktif.</small>
+            <select name="student_id" id="student_select" class="form-control" required>
+              <option value="">-- Pilih Peserta Didik --</option>
+              <?php foreach ($students_by_class as $class_name => $students): ?>
+                <optgroup label="Kelas <?= e($class_name) ?>">
+                  <?php foreach ($students as $st): ?>
+                    <option value="<?= $st['id'] ?>"
+                            data-id="<?= $st['id'] ?>"
+                            data-nis="<?= e($st['nis']) ?>"
+                            data-nama="<?= e($st['nama_lengkap']) ?>"
+                            data-kelas="<?= e($st['nama_kelas']) ?>"
+                            data-poin="<?= (int)$st['total_poin'] ?>"
+                            data-phone="<?= e($st['no_telp_wali'] ?? '') ?>">
+                      <?= e($st['nama_lengkap']) ?> &bull; NIS: <?= e($st['nis']) ?> (<?= (int)$st['total_poin'] ?> Poin)
+                    </option>
+                  <?php endforeach; ?>
+                </optgroup>
+              <?php endforeach; ?>
+            </select>
+            <small style="font-size: 11px; color: var(--color-text-muted);">Pilih peserta didik aktif dari daftar per kelas.</small>
           </div>
 
           <!-- Preview Siswa yang Dipilih -->
@@ -299,178 +316,65 @@ Terima kasih.
 </div>
 
 <script>
-// Sanctions matrix client cache & students cache
+// Sanctions matrix client cache & app name
 const SANCTIONS_DATA = <?= json_encode($sanctions) ?>;
-const ALL_STUDENTS = <?= json_encode($all_active_students) ?>;
 const APP_NAME_VAL = <?= json_encode(APP_NAME) ?>;
 
 let selectedStudent = null;
 let lastRecordedResult = null;
-let searchTimer = null;
 
-const searchInput = document.getElementById('student-search-input');
-const dropdown = document.getElementById('student-dropdown');
+const studentSelect = document.getElementById('student_select');
 const categorySelect = document.getElementById('category_select');
 const submitBtn = document.getElementById('btn-submit-violation');
 
-// Auto-resolve student from typed input
-function resolveTypedStudent(queryVal) {
-  const q = (queryVal !== undefined ? queryVal : searchInput.value || '').trim().toLowerCase();
-  if (!q) return false;
+// 1. Student Selection Handler
+studentSelect.addEventListener('change', function() {
+  const opt = this.options[this.selectedIndex];
+  if (opt && opt.value !== '') {
+    selectedStudent = {
+      id: opt.value,
+      nis: opt.getAttribute('data-nis'),
+      nama_lengkap: opt.getAttribute('data-nama'),
+      nama_kelas: opt.getAttribute('data-kelas'),
+      total_poin: parseInt(opt.getAttribute('data-poin')) || 0,
+      no_telp_wali: opt.getAttribute('data-phone') || ''
+    };
 
-  // 1. Exact match by name or NIS
-  let found = ALL_STUDENTS.find(s => s.nama_lengkap.toLowerCase() === q || s.nis.toLowerCase() === q);
-
-  // 2. Partial match if query is at least 3 chars
-  if (!found && q.length >= 3) {
-    const matches = ALL_STUDENTS.filter(s => 
-      s.nama_lengkap.toLowerCase().includes(q) || 
-      s.nis.toLowerCase().includes(q)
-    );
-    if (matches.length === 1) {
-      found = matches[0];
-    } else if (matches.length > 1) {
-      const prefixMatch = matches.find(s => s.nama_lengkap.toLowerCase().startsWith(q));
-      if (prefixMatch) found = prefixMatch;
-    }
+    document.getElementById('disp_student_name').textContent = selectedStudent.nama_lengkap;
+    document.getElementById('disp_student_nis').textContent = selectedStudent.nis;
+    document.getElementById('disp_student_class').textContent = selectedStudent.nama_kelas;
+    document.getElementById('disp_student_phone').textContent = selectedStudent.no_telp_wali || 'Belum diisi';
+    document.getElementById('disp_student_points').textContent = selectedStudent.total_poin + ' Poin';
+    document.getElementById('student-selected-box').style.display = 'block';
+  } else {
+    selectedStudent = null;
+    document.getElementById('student-selected-box').style.display = 'none';
   }
-
-  if (found) {
-    selectStudent(found);
-    return true;
-  }
-  return false;
-}
-
-// 1. Asynchronous Student Search Autocomplete
-searchInput.addEventListener('input', function() {
-  clearTimeout(searchTimer);
-  const q = this.value.trim();
-
-  // Instant check if typed text matches a student exactly
-  if (q.length >= 3) {
-    const exact = ALL_STUDENTS.find(s => s.nama_lengkap.toLowerCase() === q.toLowerCase() || s.nis.toLowerCase() === q.toLowerCase());
-    if (exact) {
-      selectStudent(exact);
-      return;
-    }
-  }
-
-  if (q.length < 2) {
-    dropdown.innerHTML = '';
-    dropdown.classList.remove('active');
-    return;
-  }
-
-  searchTimer = setTimeout(async () => {
-    dropdown.innerHTML = '<div style="padding:10px; color:var(--color-text-muted); font-size:12px;">Mencari di basis data...</div>';
-    dropdown.classList.add('active');
-
-    try {
-      const res = await apiRequest(`<?= BASE_URL ?>/api/students.php?action=search&q=${encodeURIComponent(q)}`);
-      if (res.success && res.data.length > 0) {
-        let html = '';
-        res.data.forEach(s => {
-          html += `
-            <div class="autocomplete-item" onclick='selectStudent(${JSON.stringify(s)})'>
-              <div>
-                <div style="font-weight:600; color:var(--color-primary);">${s.nama_lengkap}</div>
-                <div style="font-size:11px; color:var(--color-text-muted);">NIS: ${s.nis} &bull; Kelas: ${s.nama_kelas}</div>
-              </div>
-              <div>
-                <span class="badge-points ${s.total_poin >= 30 ? 'warning' : 'safe'}">${s.total_poin} Poin</span>
-              </div>
-            </div>
-          `;
-        });
-        dropdown.innerHTML = html;
-      } else {
-        dropdown.innerHTML = '<div style="padding:10px; color:var(--color-text-muted); font-size:12px;">Siswa tidak ditemukan.</div>';
-      }
-    } catch (e) {
-      dropdown.innerHTML = '<div style="padding:10px; color:var(--color-danger); font-size:12px;">Gagal memuat hasil pencarian.</div>';
-    }
-  }, 250);
-});
-
-searchInput.addEventListener('change', function() {
-  if (!selectedStudent) {
-    resolveTypedStudent(this.value);
-  }
-});
-
-searchInput.addEventListener('blur', function() {
-  setTimeout(() => {
-    if (!selectedStudent && searchInput.value.trim().length >= 2) {
-      resolveTypedStudent(searchInput.value);
-    }
-  }, 200);
-});
-
-searchInput.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    resolveTypedStudent(this.value);
-  }
-});
-
-// Close dropdown on click outside
-document.addEventListener('click', function(e) {
-  if (!dropdown.contains(e.target) && e.target !== searchInput) {
-    dropdown.classList.remove('active');
-  }
-});
-
-// 2. Select Student Handler
-function selectStudent(student) {
-  selectedStudent = student;
-  document.getElementById('selected_student_id').value = student.id;
-  document.getElementById('disp_student_name').textContent = student.nama_lengkap;
-  document.getElementById('disp_student_nis').textContent = student.nis;
-  document.getElementById('disp_student_class').textContent = student.nama_kelas;
-  document.getElementById('disp_student_phone').textContent = student.no_telp_wali || 'Belum diisi';
-  document.getElementById('disp_student_points').textContent = student.total_poin + ' Poin';
-
-  // Toggle UI
-  searchInput.parentElement.parentElement.style.display = 'none';
-  document.getElementById('student-selected-box').style.display = 'block';
-  dropdown.classList.remove('active');
-
-  // Category is always enabled
-  categorySelect.disabled = false;
-  categorySelect.focus();
 
   updateCalculationsAndPreview();
-}
+});
 
-// 3. Clear Selected Student
+// 2. Clear Selected Student
 function clearSelectedStudent() {
   selectedStudent = null;
-  document.getElementById('selected_student_id').value = '';
+  studentSelect.selectedIndex = 0;
   document.getElementById('student-selected-box').style.display = 'none';
-  searchInput.parentElement.parentElement.style.display = 'block';
-  searchInput.value = '';
-  searchInput.focus();
-
-  // Keep category select enabled so user can always pick category
-  categorySelect.disabled = false;
-  submitBtn.disabled = true;
-  document.getElementById('points-indicator-box').style.display = 'none';
-
+  studentSelect.focus();
   updateCalculationsAndPreview();
 }
 
-// 4. Category Change Handler & Real-Time Calculations
+// 3. Category Change Handler & Real-Time Calculations
 categorySelect.addEventListener('change', updateCalculationsAndPreview);
 document.getElementById('inp_date').addEventListener('change', updateCalculationsAndPreview);
 
 function updateCalculationsAndPreview() {
   const opt = categorySelect.options[categorySelect.selectedIndex];
   const hasCat = opt && opt.value !== '';
+  const hasStudent = selectedStudent !== null;
 
-  submitBtn.disabled = !(selectedStudent && hasCat);
+  submitBtn.disabled = !(hasStudent && hasCat);
 
-  if (selectedStudent && hasCat) {
+  if (hasStudent && hasCat) {
     const pts = parseInt(opt.getAttribute('data-poin')) || 0;
     const currentPts = parseInt(selectedStudent.total_poin) || 0;
     const projectedTotal = currentPts + pts;
@@ -525,7 +429,7 @@ ${APP_NAME_VAL}`;
 
     document.getElementById('wa-preview-text').textContent = waText;
 
-  } else if (hasCat && !selectedStudent) {
+  } else if (hasCat && !hasStudent) {
     const pts = parseInt(opt.getAttribute('data-poin')) || 0;
     document.getElementById('points-indicator-box').style.display = 'block';
     document.getElementById('disp_added_points').textContent = '+' + pts + ' Poin';
@@ -539,13 +443,9 @@ ${APP_NAME_VAL}`;
   }
 }
 
-// 5. Form Submission via AJAX with Transaction & Double-Submit Guard
+// 4. Form Submission via AJAX with Transaction & Double-Submit Guard
 document.getElementById('violation-form').addEventListener('submit', async function(e) {
   e.preventDefault();
-
-  if (!selectedStudent) {
-    resolveTypedStudent(searchInput.value);
-  }
 
   if (!selectedStudent || !categorySelect.value) {
     Toast.error('Formulir Belum Lengkap', 'Pilih siswa dan kategori pelanggaran terlebih dahulu.');
